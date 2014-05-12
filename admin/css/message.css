@@ -1,0 +1,7 @@
+.pages-messages .well {
+border: none!important;
+padding: 0;
+}
+.pages-messages span.input-icon {
+width: 100%;
+}

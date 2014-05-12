@@ -1,0 +1,145 @@
+.bubble {
+padding: 3px;
+background: #eee;
+border-radius: 3px;
+}
+.discussion-bubble {
+margin: 20px 0;
+color: #333333;
+}
+.comment-header {
+height: 33px;
+line-height:33px;
+padding: 0 10px 0 6px;
+border-bottom: 1px solid #ccc;
+background-color: #e1e1e1;
+background-image: -moz-linear-gradient(#f8f8f8, #e1e1e1);
+background-image: -webkit-linear-gradient(#f8f8f8, #e1e1e1);
+background-image: linear-gradient(#f8f8f8, #e1e1e1);
+background-repeat: repeat-x;
+font-size: 12px;
+}
+.comment-header .icon-comment {
+color: #939AA0;
+margin: 8px 2px 0 1px;
+}
+.comment-header .comment-header-right {
+float: right;
+}
+.comment-header .comment-header-author {
+max-width: 600px;
+line-height: 33px;
+font-weight: bold;
+color: #222;
+text-shadow: 1px 1px 0 rgba(255,255,255,0.7);
+overflow: hidden;
+white-space: nowrap;
+text-overflow: ellipsis;
+}
+.discussion-bubble .discussion-bubble-avatar {
+position: relative;
+float: left;
+border-radius: 3px;
+}
+.discussion-bubble .discussion-bubble-content:before {
+content: "";
+display: block;
+height: 0;
+width: 0;
+border: 10px solid #EEE;
+border-width: 10px 10px 10px 0;
+border-color: rgba(238,238,238,0) #eee rgba(238,238,238,0) rgba(238,238,238,0);
+position: absolute;
+left: -10px;
+top: 15px;
+}
+.discussion-bubble .discussion-bubble-content {
+position: relative;
+margin-left: 60px;
+}
+.discussion-topic-header {
+position: relative;
+padding: 10px;
+word-wrap: break-word;
+}
+.discussion-bubble-inner {
+min-height: 32px;
+border: 1px solid #CACACA;
+background-color: #fff;
+}
+.discussion-topic-header .discussion-topic-title {
+border-bottom: none;
+margin: 0;
+padding-right: 50px;
+font-size:21px;
+}
+.discusion-topic-infobar {
+width: 100%;
+height: 47px;
+padding: 13px 10px 4px;
+border: 1px solid #e5e5e5;
+border-width: 1px 0;
+background: #f5f5f5;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+.comment-content {
+padding: 0;
+color: #333;
+font-size: 12px;
+background: #fbfbfb;
+}
+.comment-content i {
+	font-size: 13px;
+}
+.discussion-topic .comment-content {
+position: relative;
+}
+.comment-content .comment-body {
+padding: 10px;
+font-size: 13px;
+overflow: auto;
+width: 100%;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+.issue-status {
+width: 100%;
+padding: 10px;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+color: #a1882b;
+background-color: #f8eec7;
+border-top: 1px solid #e2cc7a;
+}
+.issue-status {
+width: 100%;
+padding: 10px;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+color: #a1882b;
+background-color: #f8eec7;
+border-top: 1px solid #e2cc7a;
+}
+
+.issue-status.status-open {
+color: #5d8a4a;
+background-color: #d8f5cd;
+border-top-color: #a5d792;
+}
+.issue-status>p {
+margin: 0;
+}
+.issue-status>p a {
+font-weight: bold;
+}
+.none p {
+margin: 0;
+padding: 30px 20px;
+border-radius: 3px;
+text-align: center;
+font-size: 15px;
+color: #999;
+background: #f5f5f5;
+-webkit-font-smoothing: antialiased;
+}

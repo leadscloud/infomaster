@@ -1,0 +1,90 @@
+div.center{ 
+display:none;
+}
+#setup { padding:0 15px}
+#setup .table th, .table td {
+padding: 6px;
+line-height: 20px;
+}
+
+#setup .active .icon-eye-open:before {
+content: "\f070";
+}
+.wizard-cards .control-label {
+float: left;
+padding-top: 5px;
+text-align: right;
+}
+.wizard-cards .controls {
+margin-left: 100px;
+}
+.wizard-cards .control-group {
+margin-bottom: 20px;
+}
+.wizard-cards input{
+display: inline-block;
+margin-bottom: 0;
+vertical-align: middle;
+}
+.wizard-cards .popover{
+width: 165px;
+}
+
+.navbar-inverse .brand, .navbar-inverse .nav>li>a {
+color: #999;
+text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+}
+.navbar .brand {
+	float:left;
+	font-size:15px;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-weight:normal;
+text-rendering: optimizelegibility;
+}
+
+body.readme{
+	background: #fff;
+    color: #333;
+    font-family: sans-serif;
+    margin: 2em auto;
+    padding: 1em 2em;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid #dfdfdf;
+    max-width: 700px;
+}
+
+html.readme {
+    background: #f9f9f9;
+}
+.readme p,.readme li,.readme dd,.readme dt {
+    padding-bottom: 2px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.readme a {
+    color: #21759B;
+    text-decoration: none;
+}
+.readme #logo {
+	margin: 6px 0 14px 0;
+	border-bottom: none;
+	text-align: center;
+}
+.readme a:hover {
+    color: #D54E21;
+}
+.readme h1 {
+    border-bottom: 1px solid #dadada;
+    clear: both;
+    color: #666;
+    font: 24px Georgia,"Times New Roman",Times,serif;
+    margin: 30px 0 0 0;
+    padding: 0;
+    padding-bottom: 7px;
+}
+
+.readme h2 {
+    font-size: 16px;
+}

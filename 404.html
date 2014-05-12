@@ -1,0 +1,40 @@
+<?php
+function save_mod_rewrite_rules() {
+
+	$home_path = get_home_path();
+	$htaccess_file = ABS_PATH.'/.htaccess';
+
+	// If the file doesn't already exist check for write access to the directory and whether we have some rules.
+	// else check for write access to the file.
+	if ((!file_exists($htaccess_file) && is_writable($home_path)) || is_writable($htaccess_file)) {
+		if ( got_mod_rewrite() ) {
+			$rules = explode( "\n", mod_rewrite_rules() );
+			return insert_with_markers( $htaccess_file, 'WordPress', $rules );
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Get the absolute filesystem path to the root of the WordPress installation
+ *
+ * @since 1.5.0
+ *
+ * @uses get_option
+ * @return string Full filesystem path to the root of the WordPress installation
+ */
+function get_home_path() {
+	$home = get_option( 'home' );
+	$siteurl = get_option( 'siteurl' );
+	if ( $home != '' && $home != $siteurl ) {
+		$wp_path_rel_to_home = str_replace($home, '', $siteurl); /* $siteurl - $home */
+		$pos = strpos($_SERVER["SCRIPT_FILENAME"], $wp_path_rel_to_home);
+		$home_path = substr($_SERVER["SCRIPT_FILENAME"], 0, $pos);
+		$home_path = trailingslashit( $home_path );
+	} else {
+		$home_path = ABSPATH;
+	}
+
+	return $home_path;
+}

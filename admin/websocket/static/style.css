@@ -1,0 +1,22 @@
+@charset "utf-8";
+.submit{cursor: pointer;}
+.content{margin: 50px auto;width: 700px;border: 1px solid #BFBFBF;background: #FFF;}
+.content:after{content: ".";display: block;height: 0;clear: both; visibility: hidden; }
+.content{zoom: 1;}
+.message{border-bottom: 1px solid #BFBFBF;padding:10px;height: 400px;overflow: auto;line-height:1.8;}
+.message .msg{color: #FF0000;}
+.message .chat{color: #333;}
+.message .chat .name{font-size: 12px;color: #12c;font-weight: bold;}
+.message .chat.admin_chat .name{color: #FF0000;}
+.message .chat p{margin:0 0 10px 0;}
+.tool{padding: 8px 10px;border-bottom: 1px solid #BFBFBF;}
+.tool span{cursor: pointer;display: inline-block;margin-right: 14px;}
+.send {float: left;}
+.send .chat{margin: 10px;display: block;width: 450px;height: 150px;}
+.send  p{margin: 10px;}
+.list{float:right;}
+.list{float:right;margin:10px;}
+.list h3{font-size: 14px;margin:0;}
+.list .online{font-size: 12px;padding-left:6px;font-weight: normal;}
+.list ul{width: 200px;list-style: none;margin:10px 0;padding:0;height: 130px;overflow: auto;}
+.list ul li{padding:3px 0;font-size: 12px; cursor: pointer;}

@@ -1,0 +1,16 @@
+name: 询盘管理系统
+version: 1.2
+description: 
+reference:
+    -   url: http://www.trirand.com/blog/?page_id=5
+		description: 
+    -   url: http://www.trirand.net/demo/php/jqgrid/
+        description:
+    -   url: http://mj4d.iteye.com/blog/1628851
+        description:
+    -   url: http://www.helloweba.com/view-blog-164.html
+        description:
+    -   url: http://www.pin5i.com/showtopic-using-jqgrid.html
+        description:
+    -   url: http://blog.csdn.net/hurryjiang/article/details/6887976
+        description:
