@@ -11,12 +11,12 @@ include_file(COM_PATH.'/system/loader.php');
 func_add_callback('loader_add_css', language(), sprintf('/admin/css/%s.css', language()));
 // 加载公共模块
 include_modules();
-
-// 检查是否已配置，设置安装界面时修改
-/*defined('NO_REDIRECT') or define('NO_REDIRECT', false);
+// 检查是否已配置
+defined('NO_REDIRECT') or define('NO_REDIRECT', false);
 if (!NO_REDIRECT && (!is_file(ABS_PATH.'/config.php') || !installed())) {
     redirect(ADMIN.'install.php');
-}*/
+}
+
 /**
  * 验证用户权限
  *

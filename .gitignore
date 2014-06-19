@@ -3,3 +3,6 @@
 *.tags_sorted_by_file
 config.php
 app.log
+error.log
+test.php
+index.bak.php

@@ -1,4 +1,14 @@
 <?php
+if ( !file_exists( dirname(__FILE__) . '/config.php') ) {
+  $html = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
+  $html.= '<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+  $html.= '<meta http-equiv="refresh" content="0;url=admin/" />';
+  $html.= '<title>询盘信息管理系统</title>';
+  $html.= '<script type="text/javascript">location.replace("admin/");</script>';
+  $html.= '</head><body>';
+  $html.= '</body></html>';
+  exit($html);
+}
 // 加载公共文件
 include dirname(__FILE__).'/admin/admin.php';
 //是否404页面

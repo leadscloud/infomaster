@@ -154,6 +154,15 @@
 		<expiry_date_format></expiry_date_format>
 	</whois_server>
 	<whois_server>
+		<extension>.kz</extension>
+		<server>whois.nic.kz</server>
+		<match_text>Domain Name............</match_text>
+		<creation_date_regex><![CDATA[Domain created:(?:[ \t]+)? ([0-9]{4})-([0-9]{2})-([0-9]{2})]]></creation_date_regex>
+		<creation_date_format>1-2-3</creation_date_format>
+		<expiry_date_regex></expiry_date_regex>
+		<expiry_date_format></expiry_date_format>
+	</whois_server>
+	<whois_server>
 		<extension>.me</extension>
 		<server>whois.nic.me</server>
 		<match_text>Domain ID</match_text>

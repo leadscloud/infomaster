@@ -461,6 +461,7 @@ function post_pre_count($userid,$postid){
 	$offset = C('System.gmt_offset');
 	
 	$tzstring = C('System.Timezone');
+    if(!$tzstring) $tzstring = 'Asia/Shanghai';
 	$date_time_zone_selected = new DateTimeZone($tzstring);
 	$offset = timezone_offset_get($date_time_zone_selected, date_create());
 			
@@ -471,7 +472,7 @@ function post_pre_count($userid,$postid){
                 . ($offsetHours < 10 ? '0' : '') . $offsetHours 
                 . ':' 
                 . ($offsetMinutes < 10 ? '0' : '') . $offsetMinutes; 
-		//CONVERT_TZ( FROM_UNIXTIME( `datetime` ), '+00:00','%s' ) 
+
 	if($postid) 
 		$where = "WHERE `userid`=%d AND `postid`<%d AND TO_DAYS( CONVERT_TZ( FROM_UNIXTIME( `datetime` ), '+00:00','+00:00' ) ) = TO_DAYS( CONVERT_TZ( FROM_UNIXTIME( '%s' ) , '+00:00','+00:00' )  ) AND `type`='inquiry'";
 	else

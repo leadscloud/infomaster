@@ -292,6 +292,47 @@ class DBQuery {
         elseif (false) {
 
         }
+
+
+        // DATE_ADD
+        if (preg_match('/DATE_ADD\((CURDATE\(\)),\s*INTERVAL(\s*[^\)]+\s*)\)/isU', $sql, $match)) {
+        	$sql = preg_replace('/DATE_ADD\((CURDATE\(\)),\s*INTERVAL(\s*[^\)]+\s*)\)/isU', 'DATE("NOW", "\2")', $sql);
+            $sql = preg_replace('/FROM_UNIXTIME(\([^\)]+\))/i', '\1', $sql);
+        }
+        // DATE_FORMAT
+        if (preg_match('/(SELECT.*?)(DATE_FORMAT)\((\s*[^,]+\s*),\s*(\s*[^\)]+\s*)\)\s*=\s*(DATE_FORMAT)\((\s*[^,]+\s*),\s*(\s*[^\)]+\s*)\)/isU', $sql, $match)) {
+            $sql = sprintf('%s strftime(%s, %s)=strftime(%s, %s)', $match[1],$match[4], $match[3], $match[7], $match[6]);
+
+            $sql = preg_replace('/FROM_UNIXTIME(\([^\)]+\))/i', '\1', $sql);
+            $sql = preg_replace('/now\(\)/i', 'date("now")', $sql);
+
+        }
+
+        if(preg_match('/TO_DAYS\((.*?)\)/isU',$sql)){
+
+            $sql = preg_replace('/CONVERT_TZ\(([^\,]+)\,[^\,]+\,[^\)]+\)/isU', '\1', $sql);
+            $sql = preg_replace('/FROM_UNIXTIME\(([^\)]+)\)/isU', 'datetime(\1, "unixepoch")', $sql);
+            $sql = preg_replace('/TO_DAYS\(([^\)]+)\)/isU', 'date( julianday(\1) )', $sql);
+
+        }
+        if(preg_match('/[^\w]+YEAR\((.*?)\)/isU',$sql)){
+        	$sql = preg_replace('/YEAR\((.*?)\)/isU', 'strftime("%Y", \1)', $sql);
+        	$sql = preg_replace('/FROM_UNIXTIME\(([^\)]+)\)/isU', 'datetime(\1, "unixepoch")', $sql);
+        }
+        if(preg_match('/[^\w]+MONTH\((.*?)\)/isU',$sql)){
+        	$sql = preg_replace('/MONTH\((.*?)\)/isU', 'strftime("%m", \1)', $sql);
+        	$sql = preg_replace('/FROM_UNIXTIME\(([^\)]+)\)/isU', 'datetime(\1, "unixepoch")', $sql);
+        }
+        if(preg_match('/[^\w]+DAY\((.*?)\)/isU',$sql)){
+        	$sql = preg_replace('/DAY\((.*?)\)/isU', 'strftime("%d", \1)', $sql);
+        	$sql = preg_replace('/FROM_UNIXTIME\(([^\)]+)\)/isU', 'datetime(\1, "unixepoch")', $sql);
+        }
+        if(preg_match('/DATE_SUB\(([^\,]+),\s*INTERVAL([^\)]+)\s*DAY\s*\)/isU', $sql, $match)){
+        	//临时解决方案
+        	$sql = preg_replace('/WHERE\s*(.*?)\s*BETWEEN\s*DATE_SUB\(([^\,]+),\s*INTERVAL([^\)]+)\s*DAY\s*\)/isU', 'WHERE julianday(date("now")) - julianday(date(\1)) > \3', $sql);
+        	$sql = preg_replace('/FROM_UNIXTIME\(([^\)]+)\)/isU', 'datetime(\1, "unixepoch")', $sql);
+        }
+
         return $sql;
     }
     /**

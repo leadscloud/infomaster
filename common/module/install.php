@@ -36,15 +36,15 @@ function installed() {
  * @return bool
  */
 function install_defaults($initial) {
-	$guessurl = guess_url();
+  $guessurl = guess_url();
     // 默认设置
     $options = array(
         // 2.0
-		'home' 				=> $guessurl,
+    'home'        => $guessurl,
         'Installed'         => W3cDate(),
         'Language'          => 'zh-CN',
         'Timezone'          => 'Asia/Shanghai',
-		'gmt_offset'        => '8'
+    'gmt_offset'        => '8'
     );
     // 覆盖或升级设置
     foreach($options as $k=>$v) {
@@ -55,8 +55,8 @@ function install_defaults($initial) {
     // 安装初始化数据
     if ($initial) {
         $db = get_conn();
-		$date = time();
-		//创建分类
+    $date = time();
+    //创建分类
     }
     return true;
 }
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS `#@_post` (
   `email` varchar(50) NOT NULL,
   `phone` varchar(50) NOT NULL,
   `country` varchar(30) NOT NULL,
-  ·continent· varchar(20) NOT NULL,
+  `continent` varchar(20) NOT NULL,
   `province` varchar(30) NOT NULL,
   `producttype` varchar(30) NOT NULL,
   `auction` varchar(20) NOT NULL,
@@ -256,13 +256,13 @@ CREATE TABLE IF NOT EXISTS `#@_contact` (
 CREATE TABLE IF NOT EXISTS `#@_history` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `datetime` datetime NOT NULL,
-  `action` VARCHAR(256) NOT NULL COLLATE utf8_general_ci,
-  `objecttype` VARCHAR(256) NOT NULL COLLATE utf8_general_ci,
-  `objectsubtype` VARCHAR(256) NOT NULL COLLATE utf8_general_ci,
+  `action` VARCHAR(256) NOT NULL,
+  `objecttype` VARCHAR(256) NOT NULL,
+  `objectsubtype` VARCHAR(256) NOT NULL,
   `userid` int(10) NOT NULL,
   `objectid` int(10) NOT NULL,
-  `objectname` VARCHAR(256) NOT NULL COLLATE utf8_general_ci,
-  `description` mediumtext COLLATE utf8_general_ci,
+  `objectname` VARCHAR(256) NOT NULL,
+  `description` mediumtext,
   PRIMARY KEY  (id)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;
 
@@ -313,13 +313,11 @@ CREATE TABLE IF NOT EXISTS `#@_domain` (
   `language` varchar(10) NOT NULL,
   `domaintype` varchar(10) NOT NULL,
   `whois` TEXT NOT NULL,
-
   `extloginurl` varchar(255) NOT NULL,
   `extloginname` varchar(100) NOT NULL,
   `extloginpass` varchar(100) NOT NULL,
   `addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `edittime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-
   `description` TEXT NOT NULL,
   `userid` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)

@@ -1260,7 +1260,7 @@ function generate_identifier($postid){
 	$serial = $post['serial'];
 	$rate = $post['inforate'];
 	$language = $post['language'];
-	$symbol	= $user['symbol'];
+	$symbol	= isset($user['symbol'])?$user['symbol']:'unknown';
 	//$date	= date('Ymd', $post['datetime']);
 	$date	= date_gmt('Ymd', $post['datetime']);
 	//额外添加的两个字段

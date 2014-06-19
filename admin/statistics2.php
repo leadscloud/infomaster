@@ -151,7 +151,8 @@ switch ($method) {
             	$collect[$data['belong']]['host'][$host][$data['inforate']][] = $data['landingurl'];
 			}
 		}
-
+		//print_r($collect);
+		//
 		if($where){
 			$count_sql = "SELECT COUNT(`postid`) as post_count, `inforate`,`landingurl`, `belong` FROM `#@_post` {$where} GROUP BY `belong`,`inforate` order by post_count DESC, `inforate` DESC";
 		}else{
@@ -166,12 +167,6 @@ switch ($method) {
 			}
 		}
 		
-		if(count($collect)==1 && key($collect)==null && empty(current($collect)['host'])){
-			$current_array = current($collect);
-			if(empty($current_array['host'])){
-				$collect[key($collect)]['host']=array();
-			}
-		}
 
 		//处理数组，获得每个询盘等级的数量
 		foreach($collect as $name=>$data) {
@@ -198,12 +193,8 @@ switch ($method) {
 
 			$total = isset($data['count']['total'])?$data['count']['total']:0;
 			$totalvaild = isset($data['count']['totalvaild'])?$data['count']['totalvaild']:0;
-			if($total!=0) {
-				$percentage = $totalvaild/$total;
-			}else{
-				$percentage = 0;
-			}
-			
+			//if($total==0) break;
+			$percentage = $totalvaild/$total;
 			$percent_friendly = number_format( $percentage * 100, 2 ) . '%';
 
 			$cur_user = user_get_byname($name);

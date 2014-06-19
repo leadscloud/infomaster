@@ -218,9 +218,9 @@ switch ($method) {
 
 				    }
 				    catch (Exception $e){
-				        $expirationdate = 'NULL';
-				        $registrationdate = 'NULL';
-				        ajax_error($e->getMessage());
+				        $expirationdate = null;
+				        $registrationdate = null;
+				        //ajax_error($e->getMessage());
 				    }
 
 				    if($expirationdate) $expirationdate = W3cDate(strtotime($expirationdate)); //UNIXTIME
@@ -400,6 +400,7 @@ switch ($method) {
 		    	$where.= ' AND DATE(`expirationdate`) <= DATE_ADD(CURDATE(), INTERVAL + 90 DAY) ';
 		}
 
+		$db = get_conn();
 		// 根据分类筛选
 		if ($search) {
 			$query['query'] = $search;
@@ -409,14 +410,19 @@ switch ($method) {
             }
             $where.= ' AND ('.implode(' OR ', $conditions).')';
 			$sql = "SELECT DISTINCT(`d`.`id`) FROM `#@_domain` AS `d` LEFT JOIN `#@_domain_meta` AS `dm` ON `d`.`id`=`dm`.`domainid` {$where} ORDER BY `d`.`id` ASC";
+
+			$domain_count = $db->result("SELECT COUNT(DISTINCT(`d`.`id`)) FROM `#@_domain` AS `d` LEFT JOIN `#@_domain_meta` AS `dm` ON `d`.`id`=`dm`.`domainid` {$where} ORDER BY `d`.`id` ASC");
 		}  else {
 			// 没有任何筛选条件
 		    $sql = "SELECT `id` FROM `#@_domain` {$where} ORDER BY `id` {$order}";
+		    $domain_count = $db->result("SELECT count(`id`) FROM `#@_domain` {$where} ORDER BY `id` {$order}");
 		}
 		$result = pages_query($sql);
 
-		$count_expired_result = pages_query("SELECT count(`id`) AS count FROM `#@_domain` WHERE DATE(`expirationdate`) <= DATE_ADD(CURDATE(), INTERVAL + 90 DAY)");
-		$count_expired = pages_fetch($count_expired_result);
+		
+
+		$count_expired_result = $db->query("SELECT count(`id`) AS count FROM `#@_domain` WHERE DATE(`expirationdate`) <= DATE_ADD(CURDATE(), INTERVAL + 90 DAY)");
+		$count_expired = $db->fetch($count_expired_result);
 		
 
 		// 分页地址

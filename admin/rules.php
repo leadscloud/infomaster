@@ -27,7 +27,11 @@ switch ($method) {
 	    system_head('loadevents','rule_manage_init');
 	    include ADMIN_PATH.'/admin-header.php';
         // 显示页面
-	    rule_manage_page('add');
+        if(!current_user_can('ALL',false)){
+        	echo "<h1 style=\"color:red\">请大家把域名添加到域名管理里面，不要再在这儿添加了。</h1>";
+        }else{
+        	rule_manage_page('add');
+        }
         include ADMIN_PATH.'/admin-footer.php';
 	    break;
 	case 'edit':
