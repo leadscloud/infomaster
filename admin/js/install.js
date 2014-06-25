@@ -15,6 +15,7 @@ function is_empty(el){
 }
 // 改变数据库类型
 function install_change_dbtype(type) {
+	console.info(type);
     // sqlite
     if (type.substr(0,6)=='sqlite' || type.substr(0,10)=='pdo_sqlite') {
         $('input#dbuname,input#dbpwd,input#dbhost').parents('.control-group').hide();
@@ -53,11 +54,14 @@ $(function() {
 	});
 	
 	$('input#dbuname,input#dbpwd,input#dbhost').parents('.control-group').hide();
-	
-	wizard.el.find(".wizard-db-select").change(function() {
-		var dbtype = $(this).val();
-		install_change_dbtype(dbtype);
-	});
+
+	var dbtype = $('select#dbtype');
+    if (dbtype.is('select')) {
+        dbtype.change(function(){
+            install_change_dbtype(this.value);
+        });
+        install_change_dbtype(dbtype.val());
+    }
 
 
 	//提交表单

@@ -6,3 +6,7 @@ app.log
 error.log
 test.php
 index.bak.php
+.htaccess
+test
+*.db
+*.sqlite

@@ -91,7 +91,8 @@ if (validate_is_post()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="Ray.">
-	<meta name="robots" content="noindex, nofollow" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="robots" content="noindex, nofollow" />
 
     <!-- Le styles -->
     <link href="common/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
@@ -1089,5 +1090,11 @@ $(document).ready(function(){
 	});
 });
 </script>
+<!--
+Name: zhanglei
+Website: http://www.love4026.org
+Email: sbmzhcn@gmail.com
+Last update: 2014/06/25
+-->
 </body>
 </html>

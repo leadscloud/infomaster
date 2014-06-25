@@ -1,8 +1,18 @@
 <?php
+/*****************************************************************************************
+ * PHP 集团营销数据平台                                                                  *
+ * Copyright (C) 2013 by Ray Chang (张雷).    All rights reserved.                       *
+ *                                                                                       *
+ * 实现集团营销体系的数据及时共享和分析功能                                              *
+ * Author Website: http://love4026.org                                                   *
+ * Version: 1.1.Alpha1                                                                   *
+ *****************************************************************************************/
 // 检查环境是否适合做爱做的事
 !version_compare(PHP_VERSION, '4.3.3', '<') or die('PHP version lower than 4.3.3, upgrade PHP!<br/>&lt;<a href="http://php.net/downloads.php" target="_blank">http://php.net/downloads.php</a>&gt;');
 // 设置错误等级
 error_reporting() === E_ALL & ~E_NOTICE or error_reporting(E_ALL & ~E_NOTICE);
+// 禁用错误报告
+// error_reporting(0);
 // 定义项目物理跟路径
 define('ABS_PATH',dirname(__FILE__));
 // 定义项目物理公共目录
@@ -22,12 +32,6 @@ include COM_PATH.'/system/cookie.php';
 include COM_PATH.'/system/fcache.php';
 // 加载本地化语言类库
 //include COM_PATH.'/system/l10n.php';
-//判断配置文件是否存在
-if ( !file_exists( ABS_PATH . '/config.php') ) {
-	$home_url = get_home_url();
-	echo error_page('找不到配置文件',"配置文件<code>config.php</code>不存在,你可以通过查看根目录下的 <a href='$home_url/readme.html'>readme.html</a> 帮助文件来重新配置<code>config.php</code>",true);
-	exit();
-}
 // 设置系统时区
 //time_zone_set(C('System.Timezone')==null?'Asia/Shanghai':C('System.Timezone'));
 // Set default timezone in PHP 5.

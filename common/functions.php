@@ -474,6 +474,16 @@ function esc_html($str){
  * @return mixed
  */
 function esc_js($str) {
+    if (function_exists('preg_replace_callback')) {
+        $str = preg_replace_callback(
+            '/([^ :!#$%@()*+,-.\x30-\x5b\x5d-\x7e])/',
+            function ($matches) {
+                return '\\x'.(ord($matches[1])<16? '0': '').dechex(ord($matches[1]));
+            },
+            $str
+        );
+        return $str;
+    }
     return preg_replace('/([^ :!#$%@()*+,-.\x30-\x5b\x5d-\x7e])/e',
         "'\\x'.(ord('\\1')<16? '0': '').dechex(ord('\\1'))", $str);
 }
