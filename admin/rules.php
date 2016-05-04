@@ -27,11 +27,11 @@ switch ($method) {
 	    system_head('loadevents','rule_manage_init');
 	    include ADMIN_PATH.'/admin-header.php';
         // 显示页面
-        if(!current_user_can('ALL',false)){
-        	echo "<h1 style=\"color:red\">请大家把域名添加到域名管理里面，不要再在这儿添加了。</h1>";
-        }else{
+        // if(!current_user_can('ALL',false)){
+        	// echo "<h1 style=\"color:red\">请大家把域名添加到域名管理里面，不要再在这儿添加了。</h1>";
+        // }else{
         	rule_manage_page('add');
-        }
+        // }
         include ADMIN_PATH.'/admin-footer.php';
 	    break;
 	case 'edit':
@@ -159,6 +159,23 @@ switch ($method) {
 					'domain'	=> $domain,
 					'subdomain' => $is_sub
                 );
+
+                // 添加到规则里的域名自动添加到域名里
+                $url 	= new parseURL($domain);
+				$top_domain = $url->getRegisterableDomain();
+
+				$author = $_USER['name'];
+				$user = user_get_byname($author);
+				$userid = isset($user['userid'])?$user['userid']:null;
+
+                $domain_data = array(
+					'author'   			=> $author,
+					'userid'   			=> $userid,
+					'domain'   			=> $top_domain,
+					'description'   	=> '',
+					//'status'			=> $status,
+				);
+
                 // 编辑
                 if ($ruleid) {
 					$rule_info['edittime'] = date('Y-m-d H:i:s',time());
@@ -173,6 +190,7 @@ switch ($method) {
                         'edittime' => date('Y-m-d H:i:s',time())
                     ));
                     rule_add($rule_info);
+                    domain_add($top_domain, $domain_data);
                     ajax_success('规则添加成功。',"InfoSYS.redirect('".referer()."');");
                 }
             }

@@ -1,0 +1,16 @@
+2016-04-14 10:43:04 - WARNING - 404 GET http://testp3.pospr.waw.pl/testproxy.php (185.25.151.159) 0.54ms
+2016-04-14 12:46:52 - WARNING - 405 CONNECT smtp.mail.yahoo.com:25 (114.43.10.80) 1.47ms
+2016-04-14 12:47:07 - WARNING - 405 CONNECT smtp.mail.yahoo.com:25 (114.43.10.80) 0.84ms
+2016-04-14 14:23:22 - WARNING - 404 GET /manager/html (222.186.58.225) 0.79ms
+2016-04-14 14:30:23 - WARNING - 404 GET /manager/html (202.109.143.18) 0.72ms
+2016-04-14 15:33:44 - WARNING - 404 GET /manager/html (202.109.143.18) 0.67ms
+2016-04-14 15:53:12 - WARNING - 404 GET http://www.baidu.com/ (123.151.42.61) 0.62ms
+2016-04-14 16:33:41 - DEBUG - (notifier.py:52):Notifier.__init__(): login mail success
+2016-04-14 16:33:41 - DEBUG - (idler.py:83):Idler.dosync(): do sync, got and event!
+2016-04-14 16:33:41 - DEBUG - (notifier.py:111):Notifier.new_mail_callback(): new_mail_callback
+2016-04-14 16:33:42 - INFO - (notifier.py:113):Notifier.new_mail_callback(): search unseen mail, OK - ['999']
+2016-04-14 16:33:51 - DEBUG - (parse.py:204):Parse.process_commands(): Registrar: - Email:kuyafei@shibangcrusher.com - Create response: {'data': {'控制面板密码': 'IF2737V', '开通时间': '2016-4-14 16:33:44', '控制面板用户名': 'nercrusher.com', '控制面板': 'http://www.uvip.cn', '到期时间': '2017-04-14'}, 'datetime': datetime.datetime(2016, 4, 14, 16, 33, 51, 148946), 'status': 'success', 'domain': 'nercrusher.com'}
+2016-04-14 16:33:52 - DEBUG - (notifier.py:150):Notifier.process_mail(): make seen done
+2016-04-14 16:33:55 - DEBUG - (notifier.py:163):Notifier.process_mail(): send mail complete! - Re: 申请域名-ns:arch.ns.cloudflare.com:chin.ns.cloudflare.com
+2016-04-14 16:33:55 - DEBUG - (notifier.py:129):Notifier.new_mail_callback(): ID: 999 - subject: 申请域名-ns:arch.ns.cloudflare.com:chin.ns.cloudflare.com - from: [{'name': '库亚飞', 'email': 'kuyafei@shibangcrusher.com'}]
+2016-04-14 16:33:55 - DEBUG - (notifier.py:71):Notifier.__init__(): -worker size: 1

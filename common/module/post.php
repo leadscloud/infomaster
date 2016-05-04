@@ -133,33 +133,7 @@ function post_get_taxonomy($categories) {
     }
     return $result;
 }
-/**
- * 查询文章路径
- *
- * @param int $sortid
- * @param string $path
- * @param string $prefix
- * @return string
- */
-function post_get_path($sortid,$path,$prefix='') {
-    if ($prefix) {
-        $prefix = !substr_compare($prefix,'/',strlen($prefix)-1,1) ? $prefix : $prefix.'/';
-        if (strncmp($prefix,'/',1) === 0) {
-            return ltrim($prefix,'/').ltrim($path, '/');
-        }
-    }
-    if (strncmp($path,'/',1) === 0) {
-        $path = ltrim($prefix,'/').ltrim($path, '/');
-    } elseif ($sortid > 0) {
-        $taxonomy = taxonomy_get($sortid);
-        if (isset($taxonomy['path'])) {
-            $path  = $taxonomy['path'].'/'.$prefix.$path;
-        }
-    } else {
-        $path = $prefix.$path;
-    }
-    return $path;
-}
+
 /**
  * 获取文章的详细信息
  *
@@ -240,160 +214,26 @@ function post_delete($postid) {
     }
     return false;
 }
-/**
- * 生成页面
- *
- * @param  $postid
- * @return bool
- */
-function post_create($postid,&$preid=0,&$nextid=0) {
+function post_parse_belong($postid){
+    $db = get_conn();
     $postid = intval($postid);
     if (!$postid) return false;
     if ($post = post_get($postid)) {
-        $b_guid = $inner = ''; comment_create($post['postid']); // 生成评论
-        // 处理文章
-        $post['sort']     = taxonomy_get($post['sortid']);
-        $post['cmt_path'] = post_get_path($post['sortid'],$post['path'], C('Comments-Path'));
-        $post['path']     = post_get_path($post['sortid'],$post['path']);
-        // 模版设置优先级：页面设置>分类设置>模型设置
-        if (empty($post['template'])) {
-            if ($post['sortid'] > 0) {
-                $taxonomy = taxonomy_get($post['sortid']);
-                $post['template'] = $taxonomy['page'];
-            }
-            // 使用模型设置
-            if (empty($post['template'])) {
-                $model = model_get_bycode($post['model']);
-                $post['template'] = $model['page'];
-            }
-        }
-        // 加载模版
-        $html  = tpl_loadfile(ABS_PATH.'/'.system_themes_path().'/'.esc_html($post['template']));
-        $views = '<script type="text/javascript" src="'.ROOT.'common/gateway.php?func=post_views&postid='.$post['postid'].'&updated=%s"></script>';
-        // 解析tags
-        $block  = tpl_get_block($html,'tag,tags');
-        if ($block && $post['keywords']) {
-            $block['inner'] = tpl_get_block_inner($block);
-            foreach(post_get_taxonomy($post['keywords']) as $taxonomy) {
-                tpl_clean();
-                tpl_set_var(array(
-                    'name' => $taxonomy['name'],
-                    'path' => ROOT.'tags.php?q='.$taxonomy['name'],
-                ));
-                $inner.= tpl_parse($block['inner']);
-            }
-            // 生成标签块的唯一ID
-            $b_guid = guid($block['tag']);
-            // 把标签块替换成变量标签
-            $html = str_replace($block['tag'], '{$'.$b_guid.'}', $html);
-        }
-        
-        $vars = array(
-            'postid'   => $post['postid'],
-            'sortid'   => $post['sortid'],
-            'userid'   => $post['userid'],
-            'author'   => $post['author'],
-            'views'    => sprintf($views,'true'),
-            'digg'     => $post['digg'],
-            'date'     => $post['datetime'],
-            'edittime' => $post['edittime'],
-            'keywords' => taxonomy_get_keywords($post['keywords']),
-            'prepage'  => post_prepage($post['sortid'],$post['postid'],$preid),
-            'nextpage' => post_nextpage($post['sortid'],$post['postid'],$nextid),
-            'cmt_state'    => $post['comments'],
-            'cmt_ajaxinfo' => ROOT.'common/gateway.php?func=post_ajax_comment&postid='.$post['postid'],
-            'cmt_replyurl' => ROOT.'common/gateway.php?func=post_send_comment&postid='.$post['postid'],
-            'cmt_listsurl' => ROOT.$post['cmt_path'],
-            'description'  => $post['description'],
-            // 内部使用的变量，不能被当作标签输出
-            '_keywords'    => $post['keywords'],
-        );
-        // 设置分类变量
-        if (isset($post['sort'])) {
-            $vars['sortname'] = $post['sort']['name'];
-            $vars['sortpath'] = ROOT.$post['sort']['path'].'/';
-        }
-        // 清理数据
-        tpl_clean();
-        tpl_set_var($b_guid,$inner);
-        tpl_set_var($vars);
-        // 设置自定义字段
-        if (isset($post['meta'])) {
-            foreach((array)$post['meta'] as $k=>$v) {
-                tpl_set_var('post.'.$k, $v);
-            }
-        }
-        // 文章导航
-        $guide = system_category_guide($post['sortid']);
-
-        // 文章分页
-        if ($post['content'] && strpos($post['content'],'<!--pagebreak-->')!==false) {
-            $contents = explode('<!--pagebreak-->',$post['content']);
-            // 总页数
-            $pages = count($contents);
-            if (($pos=strrpos($post['path'],'.')) !== false) {
-                $basename = substr($post['path'],0,$pos);
-                $suffix   = substr($post['path'],$pos);
-            } else {
-                $basename = $post['path'];
-                $suffix   = '';
-            }
-            foreach($contents as $i=>$content) {
-                $page = $i + 1;
-                if ($page == 1) {
-                    $path  = $basename.$suffix;
-                    $title = $post['title'];
-                } else {
-                    $path  = $basename.'_'.$page.$suffix;
-                    $title = $post['title'].' ('.$page.')';
-                    tpl_set_var('views',sprintf($views,'false'));
-                }
-
-                tpl_set_var(array(
-                    'guide'   => $guide ? $guide.' &gt;&gt; '.$title : $title,
-                    'title'   => $title,
-                    'content' => $content,
-                    'path'    => ROOT.$path,
-                ));
-                $pagehtml = tpl_parse($html);
-                // 解析分页标签
-                if (stripos($pagehtml,'{pagelist') !== false) {
-                    $pagehtml = preg_replace('/\{(pagelist)[^\}]*\/\}/isU',
-                        pages_list(ROOT.$basename.'_$'.$suffix, '!_$', $page, $pages, 1),
-                        $pagehtml
-                    );
-                }
-                // 生成的文件路径
-                $file = ABS_PATH.'/'.$path;
-                // 创建目录
-                mkdirs(dirname($file));
-                // 保存文件
-                file_put_contents($file,$pagehtml);
-            }
-        }
-        // 没有分页
-        else {
-            tpl_set_var(array(
-                'guide'   => $guide ? $guide.' &gt;&gt; '.$post['title'] : $post['title'],
-                'title'   => $post['title'],
-                'content' => $post['content'],
-                'path'    => ROOT.$post['path'],
+        $landingurl = $post['landingurl'];
+        $refererurl = $post['referer'];
+        $belong = determine_url($landingurl,'网站所属人');
+        if(!$belong)
+            $belong = determine_url($refererurl,'网站所属人');
+        if($belong){
+            post_edit($postid, array(
+                'belong' => $belong,
             ));
-            // 解析分页标签
-            if (stripos($html,'{pagelist') !== false) {
-                $html = preg_replace('/\{(pagelist)[^\}]*\/\}/isU','',$html);
-            }
-            $html = tpl_parse($html);
-            // 生成的文件路径
-            $file = ABS_PATH.'/'.$post['path'];
-            // 创建目录
-            mkdirs(dirname($file));
-            // 保存文件
-            return file_put_contents($file,$html);
         }
+        return true;
     }
-    return true;
+    return false;
 }
+
 /**
  * 上一页
  *

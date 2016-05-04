@@ -47,10 +47,11 @@
 .table-striped tbody tr:hover td:nth-child(1),.table-striped tbody tr:hover td:nth-child(2),.table-striped tbody tr:hover td:nth-child(3){
 	background: #ffffd6;
 }
-
+/*
 .table-striped thead:nth-child(-n+8){
 	color: red;
 }
+*/
 .table-striped thead:nth-child(-n+2){
 	color: #333;
 }
@@ -77,4 +78,47 @@
 #statisticrange .caret {
   margin-top: 8px;
   margin-left: 2px;
+}
+
+.blink {
+    -webkit-animation-name: blinker;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+
+    -moz-animation-name: blinker;
+    -moz-animation-duration: 1s;
+    -moz-animation-timing-function: linear;
+    -moz-animation-iteration-count: infinite;
+
+    animation-name: blinker;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@-moz-keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+@keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+tbody tr td:first-child{
+    text-align:right;
+    font-size:0.7em;
+}
+thead tr td:first-child{
+  font-weight: bold;
 }

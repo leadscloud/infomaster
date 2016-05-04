@@ -1,4 +1,6 @@
 <?php
+// 加载公共文件
+include dirname(__FILE__).'/admin/admin.php';
 /**
  * 测试页面
  */
@@ -8,30 +10,26 @@ $php_file = isset($php_file) ? $php_file : 'domain.php';
 //include dirname(__FILE__).'/admin/admin.php';
 // 查询管理员信息
 //$_USER = user_current();
-function esc_js2($str) {
-    if (function_exists('preg_replace_callback')) {
-        $str = preg_replace_callback(
-	        '/([^ :!#$%@()*+,-.\x30-\x5b\x5d-\x7e])/',
-	        function ($matches) {
-	        	return '\\x'.(ord($matches[1])<16? '0': '').dechex(ord($matches[1]));
-	            //return strtolower($matches[0]);
-	        },
-	        $str
-	    );
-	    return $str;
-    }
-    return preg_replace('/([^ :!#$%@()*+,-.\x30-\x5b\x5d-\x7e])/e',
-        "'\\x'.(ord('\\1')<16? '0': '').dechex(ord('\\1'))", $str);
-}
-function esc_js( $str ) {
-	return preg_replace('/([^ :!#$%@()*+,-.\x30-\x5b\x5d-\x7e])/e',
-        "'\\x'.(ord('\\1')<16? '0': '').dechex(ord('\\1'))", $str);
-}
 
-$str = "function(){中国的 [^ :!#$%@()*+,-. asdf}";
-echo esc_js2($str);
-
-echo esc_js($str);
+function get_cat_codename($taxonomyid){
+	$sort = taxonomy_get($taxonomyid);
+	$name = $sort['codename'];
+	if($sort['codename']==null){
+		$parentid = $sort['parent'];
+		if($parentid){
+			return get_cat_codename($parentid);
+		}else{
+			return $name;
+		}
+	}else{
+		return $name;
+	}
+	return $name;
+}
+$post = post_get(2);
+$taxonomyid = isset($post['category'])?$post['category'][0]:null;
+$sort = get_parent_catid($taxonomyid);
+print_r($sort)
 
 //Start
 //
@@ -51,3 +49,4 @@ echo '<br>';
  * fb3f5ff1838e3c83f7f69653663dc27b
  * ee4ed9c2d70719ddb12442c7a91e26f5
  */
+?>

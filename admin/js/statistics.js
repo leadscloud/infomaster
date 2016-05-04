@@ -1,28 +1,32 @@
+/// <reference path="../../typings/jquery/jquery.d.ts"/>
 $(document).ready(function(){
 	$(".data-summary").click(function(){
 		$(this).next().toggle().toggleClass('active');
-
-		if($(this).find('i').hasClass("icon-plus")){
-			$(this).find('i').removeClass("icon-plus");
-			$(this).find('i').addClass("icon-minus");
-		}else {
-			$(this).find('i').addClass("icon-plus");
-			$(this).find('i').removeClass("icon-minus");
-		}
+		$(this).find('i:first-child').toggleClass(function() {
+			if ( $( this ).data( "toggle" ) ) {
+				return $( this ).data( "toggle" );
+			}
+		});
 	});
 
 
 	$(".btn-expandall").toggle(function(){
         $(this).addClass("expanded");
         $(this).html('<i class="icon-double-angle-up"></i> 收缩所有人');
-        $(".data-summary").find('i').removeClass("icon-plus");
-        $(".data-summary").find('i').addClass("icon-minus");
+		$(".data-summary").find('i:first-child').toggleClass(function() {
+			if ( $( this ).data( "toggle" ) ) {
+				return $( this ).data( "toggle" );
+			}
+		});
     }, function () {
         $(this).removeClass("expanded");
         $(this).html('<i class="icon-double-angle-down"></i> 展开所有人');
-        
-        $(".data-summary").find('i').removeClass("icon-minus");
-        $(".data-summary").find('i').addClass("icon-plus");
+		
+		$(".data-summary").find('i:first-child').toggleClass(function() {
+			if ( $( this ).data( "toggle" ) ) {
+				return $( this ).data( "toggle" );
+			}
+		});
     });
 	
 	$(".btn-expandall").click(function(e){

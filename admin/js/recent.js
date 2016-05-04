@@ -25,7 +25,7 @@ $(document).ready(function(){
 				timezone: "browser",
 				timeformat: "%Y/%m/%d",
 				minTickSize: [1, "day"],
-				min: preXDays(90),
+				min: preXDays(30),
 				//max: (new Date()).getTime()
 			}
 			 //yaxis: { min: -100, max: 100 }

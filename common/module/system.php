@@ -98,6 +98,7 @@ func_add_callback('system_purview_add', array(
     'cpanel' => array(
         '_LABEL_'           => '控制面板',
         'cpanel'           	=> '报表显示',
+        'belong-detail'     => '询盘所属人详情',
         'upgrade'           => '升级',
     ),
 	'contact' => array(

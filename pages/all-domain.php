@@ -16,6 +16,7 @@ print_r($result->rawdata);*/
 $method = isset($_GET['method'])?$_GET['method']:null;
 $result ='';
 $url	= isset($_GET['domain'])?$_GET['domain']:null;
+$password = isset($_GET['password'])?$_GET['password']:null;
 switch($method){
 	case 'checkurl':
 		$url	= isset($_POST['url'])?$_POST['url']:null;
@@ -25,13 +26,26 @@ switch($method){
 		exit;
 		break;
 	case 'whois':
+	/**
+		$w = stream_get_wrappers();
+		echo 'openssl: ',  extension_loaded  ('openssl') ? 'yes':'no', "\n";
+		echo 'http wrapper: ', in_array('http', $w) ? 'yes':'no', "\n";
+		echo 'https wrapper: ', in_array('https', $w) ? 'yes':'no', "\n";
+		echo 'wrappers: ', var_dump($w);
+*/
 		
 		$domain	= isset($_POST['domain'])?$_POST['domain']:null;
 		require_once 'DomainParser/Parser.php';
 		require_once 'WhoisParser/Parser.php';
 		error_reporting(0);
+		/*
+		$Parser1 = new Novutec\DomainParser\Parser();
+		$result1 = $Parser1->parse($domain);
+		print_r($result1);
+		*/
 		$Parser = new Novutec\WhoisParser\Parser();
 		$whois = $Parser->lookup($domain);
+		//print_r($whois);
 		$result = array($whois->created,$whois->expires);
 		echo json_encode($result);
 		exit;
@@ -44,22 +58,170 @@ switch($method){
 		//$Parser->useCache = true;
 		$db = get_conn();
 		$json_data = array('aaData'=>array());
+
+        // 其它公司的域名显示，临时
+        $other_aaData = array(
+            '红星'=>array(
+                'china-ftm.com',
+                'hxjq-machine.com',
+                'hxjqmining.com',
+                'china-sand-maker.com',
+                'crushing-mill.com',
+                'cijpart.com',
+                'hxjq-crusher.com',
+                'china-sandmaker.com',
+                'sstric.co.uk',
+                'ftm-mac.com',
+                'chinafote.com',
+                'hnftm.com',
+                'foteinfo.com',
+                'sinoftm.com',
+                'hx-jawcrusher.com',
+                'hxjq-ballmill.com',
+                'sell-ballmill.com',
+                'fte-china.com',
+                'china-cementmill.com',
+                'bestjawcrusher.com',
+                'china-ore-beneficiation.com',
+                'china-jawcrusher.com',
+                'crusher-made.com',
+                'made-crusher.com'
+            ),
+            '山美' => array(
+                'sanmecrusher.com', 
+                '51conecrusher.com',
+                'rockcrusher.mobi',
+            ),
+            '一帆' => array(
+                'crushingmachine.net',
+                'yifancrusher.net',
+                'symonscrusher.net',
+                'mobile-crusher.com',
+                'stonecrusher.org'
+            ),
+            '维科' => array(
+                'vipeakgroup.com',
+                'mill-crushers.com'
+            ),
+            '申港' => array(
+                'suncomachinery.com',
+            ),
+            '科利瑞克' => array(
+                'sand-making.net',
+                'raymond-mill.com'
+            ),
+            '建业' => array(
+                'mineral-grinder.com',
+            ),
+            '明工' => array(
+                'sievoequipments.com',
+            ),
+            '卓亚' => array(
+                'orientalcrusher.com',
+                'crusherinc.com',
+                'joyalgrindingmill.com',
+                'joyalcrusher.com'
+            ),
+            '鑫海舶' => array(
+                'aggregatequip.com',
+                'hbm-crusher.com',
+            ),
+            '郑州达威' => array(
+                'daswellmining.com',
+            ),
+            '中信重工' => array(
+                'citic-hic.com',
+            ),
+            '美卓' => array(
+                'metso.com',
+            ),
+            '山特维克' => array(
+                'sandvik.com',
+            ),
+            '特雷克斯' => array(
+                'terex.com',
+                'powerscreen.com'
+            ),
+            '特雷克斯Powerscreen' => array(
+                'blue-group.com'
+            ),
+            'Lippmann Milwaukee, Inc.' => array(
+                'lippmann-milwaukee.com'
+            ),
+            'Telsmith公司' => array(
+                'telsmith.com',
+            ),
+            '麦克洛斯基国际' => array(
+                'mccloskeyinternational.com',
+            ),
+            '日立建机' => array(
+                'hitachicm.com.au',
+                'hitachi-c-m.com',
+                'hcme.com',
+                'tatahitachi.co.in',
+                'hcmm.com.my',
+                'hitachi.ihub.ninemsn.com.au'
+            ),
+            '瑞典Tesab' => array(
+                'tesab.com',
+            ),
+            'LCN.com Ltd' => array(
+                'redrhinocrushers.com',
+            ),
+            '久益环球' => array(
+                'joyglobal.com',
+                'phmining.com',
+                'coloradomining.org'
+            ),
+            '凯斯特' => array(
+                'keestrack.com',
+            ),
+            '山启' => array(
+                'stonecrusher.hk',
+            ),
+            '盖尔特' => array(
+                'gatormachinery.com',
+            ),
+
+        );
+
+        foreach ($other_aaData as $name => $urls) {
+            foreach ($urls as $value) {
+                $json_data['aaData'][] = array('http://'.$value, 'C'.$name, 0, null, null);
+            }  
+        }
+        
+        if($password != 'sbmcrusher^537%k'){
+            echo json_encode($json_data);
+            exit();
+        }
+
 		$rs= $db->query("SELECT `domain`, `result`,`subdomain` FROM `#@_rule` WHERE `type`='网站所属人' AND `domain`<>'' ORDER BY `result`;");
 		while ($result = $db->fetch($rs)) {
 			//$whois = $Parser->lookup($result['domain']);
-			$json_data['aaData'][] = array($result['domain'],$result['result'],$result['subdomain'],null,null);
+            if($result['domain']){
+			    $json_data['aaData'][] = array($result['domain'],$result['result'],$result['subdomain'],null,null);
+            }
 		}
-		/*临时增加域名管理里的域名*/
+        
+		//临时增加域名管理里的域名
 		$rs= $db->query("SELECT `domain`, `author` FROM `#@_domain` WHERE `status`='approved' ORDER BY `author`;");
 		while ($result = $db->fetch($rs)) {
 			//$whois = $Parser->lookup($result['domain']);
-			$json_data['aaData'][] = array('http://'.$result['domain'],$result['author'],0,null,null);
+            if($result['domain']){
+                $json_data['aaData'][] = array('http://'.$result['domain'],$result['author'],0,null,null);
+            }
 		}
+
+        
+        
 		//print_r($json_data);
 		echo json_encode($json_data);
 		exit();
 		break;
 	default:
+        echo 'error';
+        exit();
 		$db = get_conn();
 		$count = $db->result("SELECT COUNT(`ruleid`) FROM `#@_rule` WHERE `type`='网站所属人' AND `domain`<>'' AND `subdomain`<>1");
 		$count2 = $db->result("SELECT COUNT(`ruleid`) FROM `#@_rule` WHERE `type`='网站所属人' AND `domain`<>'' AND `subdomain`=1");

@@ -42,6 +42,7 @@ class parseURL {
         }
 		
 		if(!isset($url)	||	empty($url)	||	trim($url) == ''	||	!is_string($url)	||	!$this->check($url)) {	return false; }
+
 		$this->url	=	$url;
 		$this->parseURL();
 	}

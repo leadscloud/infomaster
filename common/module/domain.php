@@ -11,12 +11,12 @@ defined('COM_PATH') or die('Restricted access!');
  */
 function domain_add($domain,$data=null) {
     $db = get_conn(); 
-    $is_exist = $db->result("SELECT * FROM `#@_domain` WHERE `domain`='{$domain}' LIMIT 1 OFFSET 0;");
+    $is_exist = $db->result("SELECT * FROM `#@_domain` WHERE `domain`='{$domain}' AND `status`='approved' LIMIT 1 OFFSET 0;");
 
     if(!$is_exist){
         $domainid = $db->insert('#@_domain',array(
             'domain'        => $domain,
-            'status'        => 'pending',
+            'status'        => 'approved',
             'addtime'       => date('Y-m-d H:i:s',time()),
             'edittime'      => date('Y-m-d H:i:s',time()),
         ));
@@ -25,6 +25,15 @@ function domain_add($domain,$data=null) {
 
     return null; 
 }
+
+function domain_exist($domainid) {
+    $domain = domain_get($domainid)['domain'];
+    if(empty($domain)) return false;
+    $db = get_conn(); 
+    $is_exist = $db->result("SELECT * FROM `#@_domain` WHERE `domain`='{$domain}' AND `status`='approved' LIMIT 1 OFFSET 0;");
+    return $is_exist;
+}
+
 /**
  * 更新域名信息
  *
@@ -53,6 +62,23 @@ function domain_edit($domainid,$data) {
         return array_merge($domain,$data);
     }
     return null;
+}
+function trash_domain($domainid=0){
+    $domain = domain_get($domainid);
+    if ( $domain['status'] == 'trash' )
+        return false;
+    $domain['status'] = 'trash';
+    domain_edit($domainid, $domain);
+    return true;
+}
+function status_domain($domainid=0, $status){
+    $domain = domain_get($domainid);
+    if($status){
+        $domain['status'] = $status;
+        domain_edit($domainid, $domain);
+        return true;
+    }
+    return true;
 }
 /**
  * 查找指定的域名信息

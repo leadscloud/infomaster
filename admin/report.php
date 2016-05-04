@@ -94,6 +94,17 @@ switch ($method) {
 		}
 		ajax_success('信息已删除',"InfoSYS.redirect('".referer()."');");
 		break;
+	// 重新计算网站所属人
+	case 'redeterminebelong':
+		$listids = isset($_POST['listids'])?$_POST['listids']:null;
+		if (empty($listids)) {
+	    	ajax_error('你没有选择任何项目。');
+	    }
+	    foreach ($listids as $postid) {
+			post_parse_belong($postid);
+		}
+		ajax_success('网站所属人已更新',"InfoSYS.redirect('".referer()."');");
+		break;
 	// 导出数据
 	case 'export':
 		break;
@@ -124,7 +135,7 @@ switch ($method) {
 			$remarks			= isset($_POST['remarks'])?$_POST['remarks']:null;
 			//$identifier			= isset($_POST['identifier'])?$_POST['identifier']:null;
 			$infoclass			= isset($_POST['infoclass'])?$_POST['infoclass']:$_USER['usergroup'];
-			$infomember			= isset($_POST['infomember'])?$_POST['infomember']:$_USER['nickname'];
+			$infomember			= isset($_POST['infomember'])?$_POST['infomember']:$_USER['name'];
 			$chatlog			= isset($_POST['chatlog'])?$_POST['chatlog']:null;
 			$datetime			= isset($_POST['add_date'])?$_POST['add_date']:time();
 			$addtime			= isset($_POST['add_date'])?$_POST['add_date']:time();
@@ -658,7 +669,12 @@ switch ($method) {
 				$condition_limit = '';
 			
 			$where.= $condition_limit;
-			
+
+			//限制SEO技术人员只能看自己的
+			if($_USER['usergroup']=='SEO技术人员'){
+				$where.= sprintf(" AND `p`.`belong` = '%s'",esc_sql($_USER['name']));
+			}
+
 			//所属人
 			if($belong){
 				$query['belong'] = $belong;
@@ -695,6 +711,10 @@ switch ($method) {
 				$userids = implode(",",$userids);
 				if($userids)
 					$conditions[] = sprintf("`userid` in (%s)",esc_sql($userids));
+			}
+			//限制SEO技术人员只能看自己的
+			if($_USER['usergroup']=='SEO技术人员'){
+				$conditions[] = sprintf(" `belong` = '%s'",esc_sql($_USER['name']));
 			}
             // 没有任何筛选条件
             $where = ' WHERE '.implode(' AND ' , $conditions);		
@@ -982,13 +1002,17 @@ function table_nav($side,$url) {
 	echo		'<a data-toggle="tooltip" data-original-title="导入的格式为Excel2003格式" class="btn" id="ImportData"><i class="icon-upload"></i> 导入数据</a> ';
 	}
 	echo	'</div>';
+
+	echo	'<div class="btn-group">';
+	echo		'<button class="btn" name="redeterminebelong" data-original-title="重置网站所属人"> <i class="icon-circle-blank"></i> 重置网站所属人</button> ';
+	echo	'</div>';
 	
 	echo	'<div class="btn-group">';
 	echo		'<button class="btn" name="refresh" data-original-title="刷新当前页面"> <i class="icon-refresh"></i> 刷新</button> ';
 	echo	'</div>';
 	
 	if($_USER['usergroup']=='SEO技术人员'){
-		$query = array('belong'=>$_USER['nickname']);
+		$query = array('belong'=>$_USER['name']);
 		if(isset($_GET['inforate']))
 			$query['inforate'] = $_GET['inforate'];
 		if(isset($_GET['page']))
@@ -1127,7 +1151,7 @@ function post_manage_page($action) {
 	$remarks			= isset($_DATA['remarks'])?$_DATA['remarks']:null;
 	$identifier			= isset($_DATA['identifier'])?$_DATA['identifier']:null;
 	$infoclass			= isset($_DATA['infoclass'])&&$_DATA['infoclass']!=null?$_DATA['infoclass']:$_USER['usergroup'];
-	$infomember			= isset($_DATA['infomember'])&&$_DATA['infomember']!=null?$_DATA['infomember']:$_USER['nickname'];
+	$infomember			= isset($_DATA['infomember'])&&$_DATA['infomember']!=null?$_DATA['infomember']:$_USER['name'];
 	$serial				= isset($_DATA['serial'])?$_DATA['serial']:1;
 	$chatlog			= isset($_DATA['chatlog'])?$_DATA['chatlog']:null;
 	$belong				= isset($_DATA['belong'])?$_DATA['belong']:null;
@@ -1374,7 +1398,7 @@ function post_manage_page($action) {
 	echo												'</div>';
 	echo											'</div>';
 
-	echo											'<div class="control-group control-group-mini">';
+	echo											'<div class="control-group control-group-mini hidden">';
 	echo												'<label class="control-label">客户所在国</label>';
 	echo												'<div class="controls">';
 	echo													'<select name="customer_country" class="country-select" data-placeholder="请选择客户所在国家">';
@@ -1568,6 +1592,7 @@ function post_manage_page($action) {
  * @param string $action
  */
 function post_view_page($action){
+	global $_USER;
 	$postid  = isset($_GET['postid'])?$_GET['postid']:0;
 	$referer = referer(PHP_FILE);
     $_DATA  = post_get($postid);
@@ -1608,6 +1633,10 @@ function post_view_page($action){
 	$manual_rate		= isset($_DATA['meta']['manual_rate'])?$_DATA['meta']['manual_rate']:null;
 
 	$description = unserialize($description);
+	
+	if($_USER['usergroup']=='SEO技术人员' && $_USER['name'] != $belong){
+		return;
+	}
 	
 	echo '<div class="row-fluid">';
 	echo   '<div class="span10 offset1">';
@@ -1783,8 +1812,8 @@ function display_select($selected , $num){
 				array('Google','Yahoo','Bing','Yandex','百度','360','搜狗','搜搜','其它'),
 				array('竞价','优化','EDM'),
 				//array('磨机','矿山','代理','配件','砂石','制砂机','其它'),
-				array('建筑破碎','磨机','矿山用破碎','矿山用磨机','制砂机','球磨','代理'),		
-				array('A','B','C','D','E'),
+				array('建筑破碎','磨机','矿山用破碎','矿山用磨机','制砂机','球磨','代理','长距离皮带机'),		
+				array('A','B','C+', 'C','C-','D','E'),
 			);
 	foreach ($text[$num] as $val) {
 		foreach(explode(",", $selected) as $select){
@@ -1835,11 +1864,11 @@ function dropdown_materials($selected)
 function dropdown_country($selected) {
 	$hl = '';
 	$list = array('亚洲'=>array('中国','香港','台湾','澳门',"阿富汗","阿拉伯联合酋长国","阿曼","阿塞拜疆","巴基斯坦","巴勒斯坦","巴林","不丹","朝鲜","东帝汶","菲律宾","格鲁吉亚","哈萨克斯坦","韩国","吉尔吉斯斯坦","柬埔寨","卡塔尔","科威特","老挝","黎巴嫩","马尔代夫","马来西亚","蒙古国","孟加拉国","缅甸","尼泊尔","日本","塞普勒斯","沙特阿拉伯","斯里兰卡","塔吉克斯坦","泰国","土耳其","土库曼斯坦","文莱","乌兹别克斯坦","新加坡","叙利亚","亚美尼亚","也门","伊拉克","伊朗","以色列","印度","印度尼西亚","约旦","越南"),
-		'非洲'=>array('阿尔及利亚','埃及','埃塞俄比亚','安哥拉','贝宁共和国','波札那','博茨瓦纳','布吉纳法索','蒲隆地','赤道几内亚','多哥','厄立特里亚','佛得角','冈比亚','刚果','刚果共和国','刚果民主共和国','吉布提','几内亚','几内亚比绍','加那利群岛','加纳','加蓬','辛巴威','喀麦隆','科摩罗','科特迪瓦','肯尼亚','莱索托','利比里亚','利比亚','留尼旺（法）','卢旺达','马达加斯加','马德拉群岛（葡 ）','马拉维','马里共和国','毛里求斯','毛里塔尼亚','摩洛哥','莫桑比克','纳米比亚','南非','尼日尔','尼日利亚','塞拉利昂','塞内加尔','塞舌尔','圣多美及普林西比','圣赫勒拿（英）','斯威士兰','苏丹','索马里','坦桑尼亚','突尼斯','乌干达','西撒哈拉','亚速尔群岛（葡）','赞比亚','乍得','中非'),
+		'非洲'=>array('阿尔及利亚','埃及','埃塞俄比亚','安哥拉','贝宁共和国','波札那','博茨瓦纳','布吉纳法索','蒲隆地','赤道几内亚','多哥','厄立特里亚','佛得角','冈比亚','刚果','刚果共和国','刚果民主共和国','吉布提','几内亚','几内亚比绍','加那利群岛','加纳','加蓬','津巴布韦','喀麦隆','科摩罗','科特迪瓦','肯尼亚','莱索托','利比里亚','利比亚','留尼旺（法）','卢旺达','马达加斯加','马德拉群岛（葡 ）','马拉维','马里共和国','毛里求斯','毛里塔尼亚','摩洛哥','莫桑比克','纳米比亚','南非','尼日尔','尼日利亚','塞拉利昂','塞内加尔','塞舌尔','圣多美及普林西比','圣赫勒拿（英）','斯威士兰','苏丹','索马里','索马里兰','坦桑尼亚','突尼斯','乌干达','西撒哈拉','亚速尔群岛（葡）','赞比亚','乍得','中非'),
 		'南美洲'=>array('阿根廷','巴拉圭','巴西','玻利维亚','厄瓜多尔','法属圭亚那','哥伦比亚','圭亚那','秘鲁','苏里南','委内瑞拉','乌拉圭','智利'),
 		'北美洲'=>array('阿鲁巴','安圭拉','安提瓜和巴布达','巴巴多斯','巴哈马','巴拿马','百慕大','波多黎各','伯利兹','多米尼加','多米尼克','哥斯达黎加','格林纳达','格陵兰','古巴','瓜德罗普岛','海地','荷属安的列斯','洪都拉斯','加拿大','开曼群岛','马提尼克','美国','美属维尔京群岛','蒙特塞拉特','墨西哥','尼加拉瓜','萨尔瓦多','圣基茨和尼维斯','圣卢西亚','圣文森特和格林纳丁斯','特克斯和凯科斯群岛','特立尼达和多巴哥','危地马拉','牙买加','英属维尔京群岛'),
 		'大洋洲'=>array('澳大利亚','巴布亚新几内亚','北马里亚纳','玻利尼西亚','法属波利尼西亚','斐济','关岛','基里巴斯','库克群岛','马绍尔群岛','美属萨摩亚','密克罗尼西亚','瑙鲁','纽埃','帕劳','皮特凯恩岛','萨摩亚','所罗门群岛','汤加','图瓦卢','托克劳','瓦利斯与富图纳','瓦努阿图','新喀里多尼亚','新西兰'),
-		'欧洲'=>array('阿尔巴尼亚','爱尔兰共和国','爱沙尼亚','安道尔','奥地利','白俄罗斯共和国','保加利亚','比利时','冰岛','波斯尼亚和黑塞哥维那','波兰','丹麦','德国','俄罗斯','法国','法罗群岛','梵蒂冈','芬兰','荷兰','黑山','捷克','克罗地亚','拉脱维亚','立陶宛','列支敦士登','卢森堡','罗马尼亚','马耳他','马其顿共和国','摩尔多瓦','摩纳哥','挪威','南斯拉夫','葡萄牙','瑞典','瑞士','塞尔维亚','圣马力诺','斯洛伐克','斯洛文尼亚','乌克兰','西班牙','希腊','匈牙利','意大利','英国','科索沃')
+		'欧洲'=>array('阿尔巴尼亚','爱尔兰共和国','爱沙尼亚','安道尔','奥地利','白俄罗斯共和国','保加利亚','比利时','冰岛','波斯尼亚和黑塞哥维那','波兰','丹麦','德国','俄罗斯','法国','法罗群岛','梵蒂冈','芬兰','荷兰','黑山','捷克','克罗地亚','拉脱维亚','立陶宛','列支敦士登','卢森堡','罗马尼亚','马耳他','马其顿共和国','摩尔多瓦','摩纳哥','挪威','南斯拉夫','葡萄牙','瑞典','瑞士','塞尔维亚','圣马力诺','斯洛伐克','斯洛文尼亚','乌克兰','西班牙','直布罗陀','希腊','匈牙利','意大利','英国','科索沃')
 		
 	);
 	foreach ($list as $continent=>$country) {

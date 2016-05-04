@@ -21,7 +21,6 @@ if(isset($_SERVER['REQUEST_URI'])){
 		echo error_page('404 页面未找到','找不到你所请求的页面 '.HTTP_HOST.$_SERVER['REQUEST_URI'],true);
 		exit();
 	}
-
 /*	$file_headers = get_headers(HTTP_HOST.$_SERVER['REQUEST_URI']);
 	if($file_headers[0] == 'HTTP/1.1 404 Not Found') {
     	$is_404 = true;
@@ -43,6 +42,7 @@ if ($method=='logout') {
 	//$language = language();
 }
 $is_login = false;
+
 // 只验证 POST 方式提交
 if (validate_is_post()) {
     $username   = isset($_POST['username'])?$_POST['username']:null;

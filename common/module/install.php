@@ -10,7 +10,7 @@ function installed() {
     $result = false;
     // 能取到安装日期
     if (C('Installed')) {
-        $db = @get_conn();
+        $db = get_conn();
         // 数据库链接不正确
         if (!$db) return $result;
         $tables = array(
@@ -40,11 +40,11 @@ function install_defaults($initial) {
     // 默认设置
     $options = array(
         // 2.0
-    'home'        => $guessurl,
-        'Installed'         => W3cDate(),
-        'Language'          => 'zh-CN',
-        'Timezone'          => 'Asia/Shanghai',
-    'gmt_offset'        => '8'
+        'home'        => $guessurl,
+        'Installed'   => W3cDate(),
+        'Language'    => 'zh-CN',
+        'Timezone'    => 'Asia/Shanghai',
+        'gmt_offset'  => '8'
     );
     // 覆盖或升级设置
     foreach($options as $k=>$v) {
@@ -65,6 +65,7 @@ function install_defaults($initial) {
  * 表结构
  *
  * @return string
+ * inforate 从char(1) 修改为char(2)，因为增加了C+等级
  */
 function install_schema() {
     return <<<SQL
@@ -99,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `#@_post` (
   `department` varchar(20) NOT NULL,
   `infoclass` varchar(20) NOT NULL,
   `infomember` varchar(20) NOT NULL,
-  `inforate` char(1) NOT NULL,
+  `inforate` char(2) NOT NULL,  
   `saleunit` varchar(20) NOT NULL,
   `salesubunit` varchar(20) NOT NULL,
   `operational` varchar(255) NOT NULL,
@@ -292,7 +293,7 @@ CREATE TABLE IF NOT EXISTS `#@_messages` (
   PRIMARY KEY (`id`),
   KEY `to_user` (`to_user`),
   KEY `from_user` (`from_user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
 
 CREATE TABLE IF NOT EXISTS `#@_domain` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,

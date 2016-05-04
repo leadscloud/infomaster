@@ -78,6 +78,14 @@ function log_authenticate_user($user, $password) {
 
 }
 
+function log_belong_details($userid) {
+	$user = user_get_byid($userid);
+	$nickname = isset($user['nickname'])?$user['nickname']:$user['name'];
+	$user_nickname = urlencode($nickname);
+	if(!empty($user_nickname))
+		history_add("action=details&objecttype=belong&objectid=$userid&objectname=$user_nickname");
+}
+
 // 更新用户时
 function history_profile_update($userid) {
 	$user = user_get_byid($userid);

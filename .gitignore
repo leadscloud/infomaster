@@ -10,3 +10,4 @@ index.bak.php
 test
 *.db
 *.sqlite
+.idea

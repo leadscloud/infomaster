@@ -71,9 +71,49 @@ switch ($method) {
 		current_user_can('domain-state');
 		$approved = count($listids);
 		foreach ($listids as $dmid) {
-			domain_edit($dmid,array('status'=>'approved'));
+			if(!domain_exist($dmid)){
+				domain_edit($dmid,array('status'=>'approved'));
+			} else {
+				$approved--;
+			}
 		}
 		ajax_success(sprintf('%s 个域名审核通过.', $approved),"InfoSYS.redirect('".referer()."');");
+		break;
+	case 'trash':
+		$action  = isset($_POST['action'])?$_POST['action']:null;
+	    $listids = isset($_POST['listids'])?$_POST['listids']:null;
+	    if (empty($listids)) {
+	    	ajax_error('你没有选择任何项目。');
+	    }
+		current_user_can('domain-trash');
+		
+		foreach ($listids as $id) {
+			trash_domain($id);
+			$result ='域名信息已放入回收站';
+		}
+		ajax_success($result,"InfoSYS.redirect('".referer()."');");
+		break;
+	case 'request_delete':
+		$listids = isset($_POST['listids'])?$_POST['listids']:null;
+	    if (empty($listids)) {
+	    	ajax_error('你没有选择任何项目。');
+	    }		
+		foreach ($listids as $id) {
+			status_domain($id, 'wantdelete');
+		}
+		ajax_success('域名删除请求已完成，请等待审核。',"InfoSYS.redirect('".referer()."');");
+		break;
+	case 'un_request_delete':
+		$listids = isset($_POST['listids'])?$_POST['listids']:null;
+	    if (empty($listids)) {
+	    	ajax_error('你没有选择任何项目。');
+	    }		
+		foreach ($listids as $id) {
+			status_domain($id, 'pending');
+		}
+		ajax_success('域名状态待审核。',"InfoSYS.redirect('".referer()."');");
+		break;
+	case 'update_whois':
 		break;
 	case 'delete':
 		$action  = isset($_POST['action'])?$_POST['action']:null;
@@ -115,6 +155,7 @@ switch ($method) {
 			$objSheet->SetCellValue('G1', '语种');
 			$objSheet->SetCellValue('H1', '类型');
 			$objSheet->SetCellValue('I1', '标记');
+			$objSheet->SetCellValue('J1', '添加日期');
 			//表内容
 			while ($row = $db->fetch($result)) {
 				$objSheet->SetCellValue('A'.$rowCount, $row['domain']);
@@ -126,6 +167,7 @@ switch ($method) {
 				$objSheet->SetCellValue('G'.$rowCount, $row['language']);
 				$objSheet->SetCellValue('H'.$rowCount, $row['domaintype']);
 				$objSheet->SetCellValue('I'.$rowCount, $row['marker']);
+				$objSheet->SetCellValue('J'.$rowCount, $row['addtime']);
 
 				$rowCount++; 
 			}
@@ -193,14 +235,19 @@ switch ($method) {
 				validate_check('domain',VALIDATE_EMPTY,'你必须输入一个域名');
 			}
 
-			$url 	= new parseURL($domain); 
-			$domain = $url->getRegisterableDomain();
+			$is_ip = preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/',$domain);
+
+			if(!$is_ip){
+				
+				$url 	= new parseURL($domain);
+				$domain = $url->getRegisterableDomain();
+			}
 			
 			//validate_check('domain',VALIDATE_EMPTY,'你必须输入一个域名');
 			
 			if (validate_is_ok()) {
 				//if not supply whois
-				if($expirationdate==null || $expirationdate=='0000-00-00 00:00:00'){
+				if(($expirationdate==null || $expirationdate=='0000-00-00 00:00:00') && !$is_ip){
 					include COM_PATH.'/classes/whois.php';
 			    	$whois = new whois(COM_PATH.'/whois/');
 			    	try{
@@ -279,7 +326,7 @@ switch ($method) {
 							$domainid = $domain['id'];
 							$result = '域名添加成功.';
 						} else {
-							$result = '域名添加失败，可能域名已经存在。';
+							$result = '域名添加失败，可能域名已经存在。'.serialize($domain);
 						}
 						
 					}
@@ -474,7 +521,8 @@ switch ($method) {
 				$group 	   = domain_group_get($domain['groupid'],0);
 				$groupname = isset($group['name'])?$group['name']:null;
 				$edit_url = PHP_FILE.'?method=edit&id='.$domain['id'];
-				$label_status = $domain['status']=='pending'?'label-warning':'label-success';
+				$label_status = $domain['status']!='approved'?'label-warning':'label-success';
+				if($domain['status']=='trash') $label_status = 'label-important';
 				echo '<tr class="domain-'.$domain['id'].'">';
                 echo    '<td class="check-column"><input type="checkbox" name="listids[]" value="'.$domain['id'].'" /></td>';
 				echo    '<td><a href="'.$edit_url.'" title="'.$domain['domain'].'">'.$domain['domain'].'</a></td>';
@@ -506,7 +554,7 @@ switch ($method) {
 		break;
 }
 function translate_status($string) {
-	$status = array('pending'=>'待审核','approved'=>'已审核');
+	$status = array('pending'=>'待审核','approved'=>'已审核', 'wantdelete'=>'请求删除', 'trash'=>'回收站');
 	$string = trim($string);
 	if(isset($status[$string])) return $status[$string];
 	return $string;
@@ -526,7 +574,14 @@ function table_nav($side,$url) {
 	echo   '<div class="btn-group pull-left">';
 	echo     '<button class="btn" data-toggle="tooltip" data-original-title="返回上级URL" onclick="javascript:;InfoSYS.redirect(\''.$referer.'\')"><i class="icon-arrow-up"></i> 返回</button>';
 	echo	 '<button class="btn" name="delete" data-toggle="tooltip" data-original-title="请选择后再删除"><i class="icon-remove"></i> 删除</button>';
+	echo	 '<button class="btn" name="trash" data-toggle="tooltip" data-original-title="请先选择"><i class="icon-trash"></i> 放入回收站</button>';
 	echo   '</div>';
+
+	echo   '<div class="btn-group pull-left">';
+	echo	 '<button class="btn" name="request_delete"><i class="icon-ok"></i> 请求删除</button>';
+	echo	 '<button class="btn" name="un_request_delete"><i class="icon-minus"></i> 取消请求</button>';
+	echo   '</div>';
+
 	if($is_domain_admin || current_user_can('ALL',false)){
 	echo   '<div class="btn-group pull-left">';
 	echo	 '<button class="btn" name="approve"><i class="icon-ok"></i> 审核通过</button>';
@@ -626,6 +681,9 @@ function domain_manage_page($action) {
 		if(!current_user_can('ALL',false) && !$is_domain_admin && $author!=$_USER['name']){
 			return false;
 		}
+	}
+	if(!$is_domain_admin && $_USER['usergroup']=='SEO技术人员' && $author !=null && $_USER['name'] != $author){
+		return;
 	}
 	
 	echo	'<div class="module-header">';
@@ -761,6 +819,7 @@ function domain_manage_page($action) {
 		echo               '<option value="approved"'.($status=='approved'?' selected="selected"':'').'>通过</option>';
 		echo               '<option value="pending"'.($status=='pending'?' selected="selected"':'').'>待审</option>';
 		echo               '<option value="closed"'.($status=='closed'?' selected="selected"':'').'>过期域名</option>';
+		echo               '<option value="trash"'.($status=='trash'?' selected="selected"':'').'>回收站</option>';
 		echo             '</select>';
 		echo		   '</div>';
 		echo		 '</div>';

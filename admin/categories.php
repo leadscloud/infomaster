@@ -46,6 +46,7 @@ switch ($method) {
         if (validate_is_post()) {
             $parent   = isset($_POST['parent']) ? $_POST['parent'] : '0';
             $name     = isset($_POST['name']) ? $_POST['name'] : null;
+            $codename = isset($_POST['codename']) ? $_POST['codename'] : null;
 			
             $description = isset($_POST['description']) ? $_POST['description'] : null;
 
@@ -64,6 +65,7 @@ switch ($method) {
             if (validate_is_ok()) {
                 $data = array(
                     'description' => esc_html($description),
+                    'codename'  => esc_html($codename),
                 );
                 // 编辑
                 if ($taxonomyid) {
@@ -249,9 +251,10 @@ function category_manage_page($action) {
     if ($action != 'add') {
         $_SORT = taxonomy_get($taxonomyid);
     }
-	//print_r($_SORT);
+	// print_r($_SORT);
     $parent = isset($_SORT['parent']) ? $_SORT['parent'] : null;
     $name   = isset($_SORT['name']) ? $_SORT['name'] : null;
+    $codename = isset($_SORT['codename']) ? strtoupper($_SORT['codename']) : null;
     $mcode  = isset($_SORT['model']) ? $_SORT['model'] : null;
     //$model  = $mcode ? model_get_bycode($mcode) : array('langcode'=>'');
     $path   = isset($_SORT['path']) ? $_SORT['path'] : null;
@@ -285,6 +288,10 @@ function category_manage_page($action) {
 	echo				'<div class="control-group"><label class="control-label" for="inputEmail">分类名称</label>';
     echo					'<div class="controls"><input type="text" name="name" id="name" placeholder="分类名称" value="'.$name.'"></div>';
   	echo				'</div>';
+
+    echo                '<div class="control-group"><label class="control-label" for="inputEmail">信息代码</label>';
+    echo                    '<div class="controls"><input type="text" name="codename" id="codename" placeholder="分类下的信息简码，默认：XXXX" value="'.$codename.'"></div>';
+    echo                '</div>';
 	
 	echo                '<div class="control-group">';
     echo                	'<label class="control-label" for="description">简介<br /><span class="resume">(最大250个字)</span></label>';

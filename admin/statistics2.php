@@ -3,7 +3,7 @@
 include dirname(__FILE__).'/admin.php';
 // 查询管理员信息
 $_USER = user_current();
-current_user_can('cpanel');
+current_user_can('cpanels');
 // 动作
 $method = isset($_REQUEST['method'])?$_REQUEST['method']:null;
 system_class('body','dashboard');
@@ -16,7 +16,7 @@ system_class('body','dashboard');
 function your_inqiury_count($rate=null){
 	global $_USER;
 	$db = get_conn();
-	$name = $_USER['nickname'];
+	$name = $_USER['name'];
 	$where = "WHERE `belong`<>'' AND `belong`='{$name}'";
 	if($rate)
 		$where .= " AND `inforate`='{$rate}'";
@@ -32,7 +32,9 @@ switch ($method) {
 	case 'getwords':
 		$helloWords = getSomeSentence();
 		ajax_success($helloWords);
-	break;
+		break;
+	case 'd3Data':
+		break;
 
 	default:
 		system_head('title', '询盘所属人概览');
@@ -94,7 +96,9 @@ switch ($method) {
 		echo               '<th width="30%">所属人</th>';
 		echo               '<th data-sortBy="numeric">A类询盘</th>';
 		echo               '<th>B类询盘</th>';
+                         echo               '<th>C+类询盘</th>';
 		echo               '<th>C类询盘</th>';
+                         echo               '<th>C-类询盘</th>';
 		echo               '<th>D类询盘</th>';
 		echo               '<th>E类询盘</th>';
 		echo             '</tr>';
@@ -151,8 +155,7 @@ switch ($method) {
             	$collect[$data['belong']]['host'][$host][$data['inforate']][] = $data['landingurl'];
 			}
 		}
-		//print_r($collect);
-		//
+
 		if($where){
 			$count_sql = "SELECT COUNT(`postid`) as post_count, `inforate`,`landingurl`, `belong` FROM `#@_post` {$where} GROUP BY `belong`,`inforate` order by post_count DESC, `inforate` DESC";
 		}else{
@@ -166,15 +169,23 @@ switch ($method) {
 				$collect[$data['belong']]['count'][$data['inforate']] = $data['post_count'];
 			}
 		}
-		
+		$current_collect = current($collect);
+		if(count($collect)==1 && key($collect)==null && empty($current_collect['host'])){
+			$current_array = current($collect);
+			if(empty($current_array['host'])){
+				$collect[key($collect)]['host']=array();
+			}
+		}
 
 		//处理数组，获得每个询盘等级的数量
 		foreach($collect as $name=>$data) {
 			$collect[$name]['count']['total'] = count_recursive($data['host'],3); //所有询盘总数
 			$count_a = isset($collect[$name]['count']['A'])?$collect[$name]['count']['A']:0;
 			$count_b = isset($collect[$name]['count']['B'])?$collect[$name]['count']['B']:0;
-			$count_c = isset($collect[$name]['count']['C'])?$collect[$name]['count']['C']:0;
-			$collect[$name]['count']['totalvaild'] = $count_a + $count_b + $count_c; //有效询盘总数			
+                                      $count_c = isset($collect[$name]['count']['C'])?$collect[$name]['count']['C']:0;
+                                      $count_c1 = isset($collect[$name]['count']['C+'])?$collect[$name]['count']['C+']:0;
+			$count_c2 = isset($collect[$name]['count']['C-'])?$collect[$name]['count']['C-']:0;
+			$collect[$name]['count']['totalvaild'] = $count_a + $count_b + $count_c + $count_c1 + $count_c2; //有效询盘总数			
 		}
 
 		if($orderby=='totalvaild')
@@ -184,59 +195,363 @@ switch ($method) {
 		
 
 		$number = 0;
+		
+		$inquiryData=array();
 		foreach($collect as $name=>$data) {
 			$total_a = isset($data['count']['A'])?$data['count']['A']:null;
 			$total_b = isset($data['count']['B'])?$data['count']['B']:null;
 			$total_c = isset($data['count']['C'])?$data['count']['C']:null;
+                                      $total_c1 = isset($data['count']['C+'])?$data['count']['C+']:null;
+                                      $total_c2 = isset($data['count']['C-'])?$data['count']['C-']:null;
 			$total_d = isset($data['count']['D'])?$data['count']['D']:null;
 			$total_e = isset($data['count']['E'])?$data['count']['E']:null;
 
 			$total = isset($data['count']['total'])?$data['count']['total']:0;
 			$totalvaild = isset($data['count']['totalvaild'])?$data['count']['totalvaild']:0;
-			//if($total==0) break;
-			$percentage = $totalvaild/$total;
+			if($total!=0) {
+				$percentage = $totalvaild/$total;
+			}else{
+				$percentage = 0;
+			}
+
+			if(!empty($name) && $total > 10){
+				array_push($inquiryData, array('Name' => $name, 'data'=>array(
+					'A' => intval($total_a), 
+					'B' => intval($total_b), 
+                                                                'C+' => intval($total_c1),
+					'C' => intval($total_c),
+                                                                'C-' => intval($total_c2), 
+					'D' => intval($total_d),  
+					'E' => intval($total_e)
+				)));
+			}
+
+			
+
+			
 			$percent_friendly = number_format( $percentage * 100, 2 ) . '%';
 
 			$cur_user = user_get_byname($name);
 			$workplace = isset($cur_user['workplace'])?$cur_user['workplace']:null;
 
-			echo '<thead class="data-summary" style="cursor:pointer;">';
-			echo '<tr data-name="'.$name.'">';
-			echo   '<td>'.$number.'</td>';
-			echo   '<td><b title="'.$percent_friendly.'"><i class="icon-plus"></i> '.$name.'  ('.$totalvaild.'/'.$total.')</b><small class="muted"> '.$workplace.'</small></td>';
-			echo   '<td><b>'.$total_a.'</b></td>';
-			echo   '<td><b>'.$total_b.'</b></td>';
-			echo   '<td><b>'.$total_c.'</b></td>';
-			echo   '<td><b>'.$total_d.'</b></td>';
-			echo   '<td><b>'.$total_e.'</b></td>';
-			echo '</tr>';
-			echo '</thead>';
+
 			//
-			echo '<tbody class="data-detail">';
+			echo '<tbody>';
 			foreach($data['host'] as $host=>$detail){
 				$count_a = isset($detail['A'])?count($detail['A']):null;
 				$count_b = isset($detail['B'])?count($detail['B']):null;
+                                                    $count_c1 = isset($detail['C+'])?count($detail['C+']):null;
 				$count_c = isset($detail['C'])?count($detail['C']):null;
+                                                    $count_c2 = isset($detail['C-'])?count($detail['C-']):null;
 				$count_d = isset($detail['D'])?count($detail['D']):null;
 				$count_e = isset($detail['E'])?count($detail['E']):null;
 				echo '<tr>';
-				echo   '<td></td>';
-				echo   '<td class="host"><i>'.$host.' ('.($count_a+$count_b+$count_c).'/'.($count_a+$count_b+$count_c+$count_d+$count_e).')</i></td>';
-				echo   '<td>'.$count_a.'</td>';
-				echo   '<td>'.$count_b.'</td>';
-				echo   '<td>'.$count_c.'</td>';
-				echo   '<td>'.$count_d.'</td>';
-				echo   '<td>'.$count_e.'</td>';
+				echo   '<td class="host"><i>'.$host.','.$name.'</i></td>';
 				echo '</tr>';
 			}
 			echo '</tbody>';
 			$number++;
 
 		}
-
 		echo           '</table>';
+
+		echo '<style>
+path {  stroke: #fff; }
+path:hover {  opacity:0.9; }
+rect:hover {  fill:blue; }
+.axis {  font: 10px sans-serif; }
+.legend tr{    border-bottom:1px solid grey; }
+.legend tr:first-child{    border-top:1px solid grey; }
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {  display: none; }
+.legend{
+    margin-bottom:76px;
+    display:inline-block;
+    border-collapse: collapse;
+    border-spacing: 0px;
+}
+.legend td{
+    padding:4px 5px;
+    vertical-align:bottom;
+}
+.legendFreq, .legendPerc{
+    align:right;
+    width:50px;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+</style>';
+		
+		echo '<script src="http://d3js.org/d3.v3.min.js"></script>';
+		echo '<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>';
+		echo "<script>var inquiryDataJson='" . json_encode($inquiryData). "';</script>";
+		echo '<script>var inquiryData= JSON.parse(inquiryDataJson);</script>';
+		echo '<script>function dashboard(id, fData){
+    var barColor = "steelblue";
+    function segColor(c){ return {A:"#499675", B:"#61A977",C:"#7EBC76", D:"#C6DE72", E:"#F0ED73"}[c]; }
+    
+    // compute total for each state.
+    fData.forEach(function(d){d.total=d.data.A+d.data.B+d.data.C+d.data.D+d.data.E;});
+    
+    // function to handle histogram.
+    function histoGram(fD){
+        var hG={},    hGDim = {t: 60, r: 0, b: 30, l: 40};
+        hGDim.w = 900 - hGDim.l - hGDim.r, 
+        hGDim.h = 500 - hGDim.t - hGDim.b;
+            
+        //create svg for histogram.
+        var hGsvg = d3.select(id).append("svg")
+            .attr("width", hGDim.w + hGDim.l + hGDim.r)
+            .attr("height", hGDim.h + hGDim.t + hGDim.b).append("g")
+            .attr("transform", "translate(" + hGDim.l + "," + hGDim.t + ")");
+
+        // create function for x-axis mapping.
+        var x = d3.scale.ordinal().rangeRoundBands([0, hGDim.w], 0.1)
+                .domain(fD.map(function(d) { return d[0]; }));
+        //.sort(function(a,b){return b[1] - a[1]})
+
+        var y = d3.scale.linear().range([hGDim.h, 0])
+        .domain([0, d3.max(fD, function(d) { return d[1]; })]);
+
+        var tip = d3.tip()
+		  .attr(\'class\', "d3-tip")
+		  .offset([-10, 0])
+		  .html(function(d) {
+		  	console.log(d);
+		    return "<span style=\'color:#fff\'>" + d + "</span>";
+		  })
+
+        // Add x-axis to the histogram svg.
+        hGsvg.append("g").attr("class", "x axis")
+            .attr("transform", "translate(0," + hGDim.h + ")")
+            .call(d3.svg.axis().scale(x).orient("bottom"));
+        // add y-axis
+        hGsvg.append("g").attr("class", "y axis")
+            .call(d3.svg.axis().scale(y).orient("left"))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("询盘数");
+
+        // Create function for y-axis map.
+        var y = d3.scale.linear().range([hGDim.h, 0])
+                .domain([0, d3.max(fD, function(d) { return d[1]; })]);
+
+        // Create bars for histogram to contain rectangles and freq labels.
+        var bars = hGsvg.selectAll(".bar").data(fD).enter()
+                .append("g").attr("class", "bar");
+
+        bars.call(tip);
+
+        
+        
+        //create the rectangles.
+        bars.append("rect")
+            .attr("x", function(d) { return x(d[0]); })
+            .attr("y", function(d) { return y(d[1]); })
+            .attr("width", x.rangeBand())
+            .attr("height", function(d) { return hGDim.h - y(d[1]); })
+            .attr("fill",barColor)
+            .on("mouseover",mouseover)// mouseover is defined below.
+            .on("mouseout",mouseout);// mouseout is defined below.
+            
+        //Create the frequency labels above the rectangles.
+        bars.append("text").text(function(d){ return d3.format(",")(d[1])})
+            .attr("x", function(d) { return x(d[0])+x.rangeBand()/2; })
+            .attr("y", function(d) { return y(d[1])-5; })
+            .attr("text-anchor", "middle");
+
+        
+        function mouseover(d){ tip.show(d); // utility function to be called on mouseover.
+            // filter for selected state.
+            var st = fData.filter(function(s){ return s.Name == d[0];})[0],
+                nD = d3.keys(st.data).map(function(s){ return {type:s, data:st.data[s]};});
+               
+            // call update functions of pie-chart and legend.    
+            pC.update(nD);
+            leg.update(nD);
+        }
+        
+        function mouseout(d){   tip.hide(); // utility function to be called on mouseout.
+            // reset the pie-chart and legend.    
+            pC.update(tF);
+            leg.update(tF);
+        }
+        
+        // create function to update the bars. This will be used by pie-chart.
+        hG.update = function(nD, color){
+            // update the domain of the y-axis map to reflect change in frequencies.
+            y.domain([0, d3.max(nD, function(d) { return d[1]; })]);
+            
+            // Attach the new data to the bars.
+            var bars = hGsvg.selectAll(".bar").data(nD);
+            
+            // transition the height and color of rectangles.
+            bars.select("rect").transition().duration(500)
+                .attr("y", function(d) {return y(d[1]); })
+                .attr("height", function(d) { return hGDim.h - y(d[1]); })
+                .attr("fill", color);
+
+            // transition the frequency labels location and change value.
+            bars.select("text").transition().duration(500)
+                .text(function(d){ return d3.format(",")(d[1])})
+                .attr("y", function(d) {return y(d[1])-5; });            
+        }        
+        return hG;
+    }
+    
+    // function to handle pieChart.
+    function pieChart(pD){
+        var pC ={},    pieDim ={w:250, h: 250};
+        pieDim.r = Math.min(pieDim.w, pieDim.h) / 2;
+                
+        // create svg for pie chart.
+        var piesvg = d3.select(id).append("svg")
+            .attr("width", pieDim.w).attr("height", pieDim.h).append("g")
+            .attr("transform", "translate("+pieDim.w/2+","+pieDim.h/2+")");
+        
+        // create function to draw the arcs of the pie slices.
+        var arc = d3.svg.arc().outerRadius(pieDim.r - 10).innerRadius(0);
+
+        // create a function to compute the pie slice angles.
+        var pie = d3.layout.pie().sort(null).value(function(d) { return d.data; });
+
+        // Draw the pie slices.
+        piesvg.selectAll("path").data(pie(pD)).enter().append("path").attr("d", arc)
+            .each(function(d) { this._current = d; })
+            .style("fill", function(d) { return segColor(d.data.type); })
+            .on("mouseover",mouseover).on("mouseout",mouseout);
+
+        // create function to update pie-chart. This will be used by histogram.
+        pC.update = function(nD){
+            piesvg.selectAll("path").data(pie(nD)).transition().duration(500)
+                .attrTween("d", arcTween);
+        }        
+        // Utility function to be called on mouseover a pie slice.
+        function mouseover(d){
+            // call the update function of histogram with new data.
+            hG.update(fData.map(function(v){ 
+                return [v.Name,v.data[d.data.type]];}),segColor(d.data.type));
+        }
+        //Utility function to be called on mouseout a pie slice.
+        function mouseout(d){
+            // call the update function of histogram with all data.
+            hG.update(fData.map(function(v){
+                return [v.Name,v.total];}), barColor);
+        }
+        // Animating the pie-slice requiring a custom function which specifies
+        // how the intermediate paths should be drawn.
+        function arcTween(a) {
+            var i = d3.interpolate(this._current, a);
+            this._current = i(0);
+            return function(t) { return arc(i(t));    };
+        }    
+        return pC;
+    }
+    
+    // function to handle legend.
+    function legend(lD){
+        var leg = {};
+            
+        // create table for legend.
+        var legend = d3.select(id).append("table").attr("class","legend");
+        
+        // create one row per segment.
+        var tr = legend.append("tbody").selectAll("tr").data(lD).enter().append("tr");
+            
+        // create the first column for each segment.
+        tr.append("td").append("svg").attr("width", "16").attr("height", "16").append("rect")
+            .attr("width", "16").attr("height", "16")
+			.attr("fill",function(d){ return segColor(d.type); });
+            
+        // create the second column for each segment.
+        tr.append("td").text(function(d){ return d.type;});
+
+        // create the third column for each segment.
+        tr.append("td").attr("class","legendFreq")
+            .text(function(d){ return d3.format(",")(d.data);});
+
+        // create the fourth column for each segment.
+        tr.append("td").attr("class","legendPerc")
+            .text(function(d){ return getLegend(d,lD);});
+
+        // Utility function to be used to update the legend.
+        leg.update = function(nD){
+            // update the data attached to the row elements.
+            var l = legend.select("tbody").selectAll("tr").data(nD);
+
+            // update the frequencies.
+            l.select(".legendFreq").text(function(d){ return d3.format(",")(d.data);});
+
+            // update the percentage column.
+            l.select(".legendPerc").text(function(d){ return getLegend(d,nD);});        
+        }
+        
+        function getLegend(d,aD){ // Utility function to compute percentage.
+            return d3.format("%")(d.data/d3.sum(aD.map(function(v){ return v.data; })));
+        }
+
+        return leg;
+    }
+    
+    // calculate total frequency by segment for all state.
+    var tF = ["A","B","C","D","E"].map(function(d){ 
+        return {type:d, data: d3.sum(fData.map(function(t){ return t.data[d];}))}; 
+    });    
+    
+    // calculate total frequency by state for all segment.
+    var sF = fData.map(function(d){return [d.Name,d.total];});
+
+    var hG = histoGram(sF), // create the histogram.
+        pC = pieChart(tF), // create the pie-chart.
+        leg= legend(tF);  // create the legend.
+}
+
+</script>';
+
+
+		
 		echo         '</div>';
 		echo       '</div>';
+		echo '<div id="dashboard"></div>';
+		echo '<script>dashboard("#dashboard",inquiryData);</script>';
 		echo     '</div>';
 		echo   '</div>';
 		

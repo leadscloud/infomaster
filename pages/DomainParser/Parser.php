@@ -101,7 +101,8 @@ class Parser
      * @var string
      * @access protected
      */
-    protected $tldUrl = 'http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1';
+	 //http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1
+    protected $tldUrl = 'http://hg.mozilla.org/mozilla-central/raw-file/2114ef80f6ae/netwerk/dns/effective_tld_names.dat';
 
     /**
      * Output format 'object', 'array', 'json', 'serialize' or 'xml'
@@ -331,6 +332,7 @@ class Parser
      */
     private function catchTlds($existFile)
     {
+
         $content = @file_get_contents($this->tldUrl);
         
         if ($content === false) {

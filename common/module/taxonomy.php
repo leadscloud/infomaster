@@ -168,6 +168,11 @@ function taxonomy_get($taxonomyid) {
             foreach (array('description') as $field) {
                 $taxonomy[$field] = $meta[$field]; unset($meta[$field]);
             }
+            foreach (array('codename') as $field) {
+                if(isset($meta[$field]))
+                    $taxonomy[$field] = $meta[$field]; 
+                unset($meta[$field]);
+            }
             $taxonomy['meta'] = $meta;
         }
         $taxonomy['keywords'] = taxonomy_get_relation('sort_tag',$taxonomy['taxonomyid']);

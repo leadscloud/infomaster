@@ -44,8 +44,8 @@ $result = $Parser->lookup($asn);
 
 * Access WHOIS record, the object oriented way.
 ```
-echo $Result->created; // get create date of domain name
-print_r($Result->rawdata); // get raw output as array
+echo $result->created; // get create date of domain name
+print_r($result->rawdata); // get raw output as array
 ```
 
 * You may choose 5 different return types. the types are array, object, json, serialize and
@@ -66,8 +66,8 @@ $Parser->setDateFormat('%d.%m.%Y %H:%M:%S');
 the method setSpecialWhois(). Please note that if you have a special WHOIS and the WHOIS output
 looks different you need your own template.
 ```
-$Parser->setSpecialWhois('it' => array('server' => 'whois.nic.it', 'port' => 43,
-'format' => '-u username -w passsword %domain%', 'template' => 'it-your-own-template'));
+$Parser->setSpecialWhois(array('it' => array('server' => 'whois.nic.it', 'port' => 43,
+'format' => '-u username -w passsword %domain%', 'template' => 'it-your-own-template')));
 ```
 
 ToDos

@@ -9,10 +9,16 @@ include dirname(__FILE__).'/admin.php';
 // 查询管理员信息
 $_USER = user_current();
 
-//Start
+$domain = '192.168.1.1';
+$url = '192.168.1.1';
+echo preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/',$url);
+echo '------<br>';
 
-echo authcode(31);
+$url    = new parseURL($domain);
 
-echo '<br>';
+print_r($url);
 
-echo authcode(1);
+// echo $url->host;
+$domain = $url->getRegisterableDomain();
+
+echo $domain;

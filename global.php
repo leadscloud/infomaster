@@ -12,7 +12,7 @@
 // 设置错误等级
 error_reporting() === E_ALL & ~E_NOTICE or error_reporting(E_ALL & ~E_NOTICE);
 // 禁用错误报告
-// error_reporting(0);
+error_reporting(0);
 // 定义项目物理跟路径
 define('ABS_PATH',dirname(__FILE__));
 // 定义项目物理公共目录

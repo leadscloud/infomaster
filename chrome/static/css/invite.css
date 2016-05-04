@@ -1,0 +1,72 @@
+body {
+  overflow-y: scroll;
+}
+.invite-box {
+  font-family: "Helvetica Neue", Helvetica, "Nimbus Sans L", Arial, "Liberation Sans", "Hiragino Sans GB", "Source Han Sans CN Normal", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+  text-align: center;
+  padding: 10px;
+  background: #f5f5f5;
+  color: #BF4A40;
+}
+.hero-unit {
+  background: #BF4A40;
+  padding: 50px 0 70px 0;
+}
+h1,
+h2,
+h3,
+h4,
+p {
+  font-family: "Helvetica Neue", Helvetica, "Nimbus Sans L", Arial, "Liberation Sans", "Hiragino Sans GB", "Source Han Sans CN Normal", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+}
+h1 {
+  font-family: Baskerville, Georgia, "Liberation Serif", "Kaiti SC", STKaiti, "AR PL UKai CN", "AR PL UKai HK", "AR PL UKai TW", "AR PL UKai TW MBE", "AR PL KaitiM GB", KaiTi, KaiTi_GB2312, "TW\-Kai", serif;
+  font-size: 120px;
+  margin-bottom: 40px;
+}
+h2 {
+  font-family: Baskerville, Georgia, "Liberation Serif", "Kaiti SC", STKaiti, "AR PL UKai CN", "AR PL UKai HK", "AR PL UKai TW", "AR PL UKai TW MBE", "AR PL KaitiM GB", KaiTi, KaiTi_GB2312, "TW\-Kai", serif;
+  font-size: 32px;
+  letter-spacing: 1px;
+}
+h2 em {
+  border-bottom: 1px dashed white;
+  font-style: normal;
+}
+h1,
+h2 {
+  color: white;
+}
+h5 {
+  font-size: 18px;
+  margin-top: 20px;
+}
+.section-title {
+  background: #f5f5f5;
+  border-top: 1px solid white;
+  padding: 20px;
+}
+.section-title h3 {
+  letter-spacing: 3px;
+}
+h4.page-header {
+  margin-top: 60px;
+  font-size: 24px;
+}
+a.download.btn {
+  font-family: "Helvetica Neue", Helvetica, "Nimbus Sans L", Arial, "Liberation Sans", "Hiragino Sans GB", "Source Han Sans CN Normal", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+  padding: 20px 50px;
+  background: white;
+  border-width: 3px;
+  color: #357EBD;
+}
+p.alert {
+  margin-top: 20px;
+}
+.try-once {
+  display: block;
+  margin-top: 10px;
+}
+.footer {
+  margin-top: 200px;
+}

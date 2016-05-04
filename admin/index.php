@@ -11,7 +11,7 @@ $yourname = isset($_USER['nickname'])?$_USER['nickname']:$_USER['name'];
 function your_inqiury_count($rate=null){
 	global $_USER;
 	$db = get_conn();
-	$name = $_USER['nickname'];
+	$name = $_USER['name'];
 	$where = "WHERE `belong`<>'' AND `belong`='{$name}'";
 	$where .= " AND date_format(FROM_UNIXTIME(`addtime`),'%Y-%m')=date_format(now(),'%Y-%m')"; //当前月数据
 	if($rate)
@@ -26,7 +26,7 @@ switch ($method) {
 		system_head('scripts',array('jquery.flot','jquery.flot.pie','jquery.flot.time','jquery.flot.resize','jquery.flot.categories'));
 		system_head('scripts',array('js/recent'));
 		// 加载头部
-        include ADMIN_PATH.'/admin-header.php';
+		include ADMIN_PATH.'/admin-header.php';
 		echo '<div class="module-header">';
 		echo	'<h3><i class="icon-dashboard"></i> 询盘概览</h3>';
 		echo '</div>';
@@ -47,12 +47,14 @@ switch ($method) {
 		echo           '<div class="row-fluid">';
 		echo             '<div class="span4">';
 		echo               '<ul class="site-stats">';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=A&belong='.$_USER['nickname'].'"><i class="icon-trophy"></i> <strong>'.your_inqiury_count('A').'</strong> <small>A类询盘</small></a></div></li>';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=B&belong='.$_USER['nickname'].'"><i class="icon-thumbs-up"></i> <strong>'.your_inqiury_count('B').'</strong> <small>B类询盘</small></a></div></li>';
+		echo                 '<li><div class="cc"><a href="report.php?inforate=A&belong='.$_USER['name'].'"><i class="icon-trophy"></i> <strong>'.your_inqiury_count('A').'</strong> <small>A类询盘</small></a></div></li>';
+		echo                 '<li><div class="cc"><a href="report.php?inforate=B&belong='.$_USER['name'].'"><i class="icon-thumbs-up"></i> <strong>'.your_inqiury_count('B').'</strong> <small>B类询盘</small></a></div></li>';
 		echo                 '<li class="divider"></li>';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=C&belong='.$_USER['nickname'].'"><i class="icon-heart-empty"></i> <strong>'.your_inqiury_count('C').'</strong> <small>C类询盘</small></a></div></li>';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=D&belong='.$_USER['nickname'].'"><i class="icon-umbrella"></i> <strong>'.your_inqiury_count('D').'</strong> <small>D类询盘</small></a></div></li>';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=E&belong='.$_USER['nickname'].'"><i class="icon-warning-sign"></i> <strong>'.your_inqiury_count('E').'</strong> <small>E类询盘</small></a></div></li>';
+		echo                 '<li><div class="cc"><a href="report.php?inforate=C+&belong='.$_USER['name'].'"><i class="icon-heart-empty"></i> <strong>'.your_inqiury_count('C+').'</strong> <small>C+类询盘</small></a></div></li>';
+		echo                 '<li><div class="cc"><a href="report.php?inforate=C&belong='.$_USER['name'].'"><i class="icon-heart-empty"></i> <strong>'.your_inqiury_count('C').'</strong> <small>C类询盘</small></a></div></li>';
+		echo                 '<li><div class="cc"><a href="report.php?inforate=C-&belong='.$_USER['name'].'"><i class="icon-heart-empty"></i> <strong>'.your_inqiury_count('C-').'</strong> <small>C-类询盘</small></a></div></li>';
+		// echo                 '<li><div class="cc"><a href="report.php?inforate=D&belong='.$_USER['nickname'].'"><i class="icon-umbrella"></i> <strong>'.your_inqiury_count('D').'</strong> <small>D类询盘</small></a></div></li>';
+		// echo                 '<li><div class="cc"><a href="report.php?inforate=E&belong='.$_USER['nickname'].'"><i class="icon-warning-sign"></i> <strong>'.your_inqiury_count('E').'</strong> <small>E类询盘</small></a></div></li>';
 		echo               '</ul>';
 		echo             '</div>';
 		echo             '<div class="span8">';

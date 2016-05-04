@@ -28,7 +28,7 @@ function install_change_dbtype(type) {
     // mysql
     else {
         $('input#dbuname,input#dbpwd,input#dbhost').parents('.control-group').show();
-		$('input#dbuname,input#dbpwd,input#dbhost').attr('data-validate','is_empty');
+		$('input#dbuname,input#dbhost').attr('data-validate','is_empty');
         var dbname = $('input#dbname').val();
         if (dbname.substr(-3) == '.db') {
             $('input#dbname').val('test');

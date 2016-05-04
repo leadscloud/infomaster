@@ -100,8 +100,9 @@ function post_manage_init() {
     }
 	$('#operational').typeahead({
 		source: function(query,callback){
+			var sortid = $('select[name="sortid"]').val()
         	$.ajax({
-				url: "ajax_calls.php?call=getallcontact",
+				url: "ajax_calls.php?call=getallcontact"+"&sortid="+sortid,
 				type: "GET",
 				dataType: "JSON",
 				async: true,

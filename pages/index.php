@@ -1,4 +1,5 @@
 <?php
+	exit();
 // 加载公共文件
 include dirname(__FILE__).'/../admin/admin.php';
 
@@ -15,6 +16,8 @@ switch($method){
 		exit;
 		break;
 	case 'data-table':
+		echo 'error';
+		exit();
 		$data = get_domain_data();
 		$json_data = array('aaData'=>array());
 		$num = 1;

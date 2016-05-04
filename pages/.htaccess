@@ -1,7 +1,12 @@
 Order Deny,Allow
 Deny from all
 Allow from 1.192.121.77 #zhengzhou ip
+Allow from 218.28.15.130 #zhengzhou ip
 Allow from 116.247.96.94 #shanghai ip
+Allow from 101.231.192.210 #shanghai ip
+#Allow from 192.168.1.10 #shanghai ip
+
+ErrorDocument 403 403.php
 
 # Apache configuration file
 # httpd.apache.org/docs/2.2/mod/quickreference.html

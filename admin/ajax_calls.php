@@ -34,7 +34,8 @@ if(!empty($_REQUEST['call'])){
 			$status['status'] = clearCache( current_user_can('clear-cache',false) );
 			break;
 		case 'getallcontact':
-			$status = get_all_contact();
+			$sortid = isset($_REQUEST['sortid'])?$_REQUEST['sortid']:null;
+			$status = get_all_contact($sortid);
 			break;
 		case 'getinqiuryinfo':
 			$rate = isset($_REQUEST['rate'])?$_REQUEST['rate']:'all';

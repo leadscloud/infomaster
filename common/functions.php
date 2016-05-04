@@ -257,7 +257,10 @@ function C($key,$value=null){
 		if($module==null) $module ='System'; //自己加的
     	$code   = array_shift($args);
     } else {
-        $module = $_USER['name'];//'System';
+		if($_USER)
+        	$module = $_USER['name'];//'System';
+		else
+			$module ='System';
     	$code   = $key;
     }
     $db  = @get_conn();
@@ -521,7 +524,7 @@ function error_page($title,$content,$is_full=false) {
     if ($is_full) {
         $hl = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
         $hl.= '<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-        $hl.= '<title>'.$title.' &#8212; InofMaster</title>';
+        $hl.= '<title>'.$title.' &#8212; InfoMaster</title>';
         $hl.= $css.'</head><body>'.$page;
         $hl.= '</body></html>';
     } else {
@@ -1256,15 +1259,35 @@ function parse_args( $args, $defaults = '' ) {
 }
 
 function badge_rate($level){
-	$arr = array("A" => "badge-success", "B" => "badge-info", "C" => "badge-warning", "D" => "badge-important", "E" => "badge-inverse");
+	$arr = array("A" => "badge-success", "B" => "badge-info", "C" => "badge-warning", "C+" => "badge-warning", "C-" => "badge-warning", "D" => "badge-important", "E" => "badge-inverse");
 	$class = strtr($level,$arr);
 	return '<span class="badge '.$class.'">'.$level.'</span>';
+}
+
+function get_cat_codename($taxonomyid){
+    $sort = taxonomy_get($taxonomyid);
+    $name = $sort['codename'];
+    if($sort['codename']==null){
+        $parentid = $sort['parent'];
+        if($parentid){
+            return get_cat_codename($parentid);
+        }else{
+            return $name;
+        }
+    }else{
+        return $name;
+    }
+    return $name;
 }
 
 function generate_identifier($postid){
 	//$department,$source,$user,$serial,$rate,$language
 	$post = post_get($postid);
 	$user = user_get_byid($post['userid']);
+    $taxonomyid = isset($post['category'])?$post['category'][0]:null;
+    $codename = get_cat_codename($taxonomyid);
+    // $_SORT = taxonomy_get($taxonomyid);
+
 	$infoclass = $post['infoclass'];
 	$source = $post['source'];
 	$serial = $post['serial'];
@@ -1376,11 +1399,17 @@ function generate_identifier($postid){
 		case '波斯语':
 			$language = 'IR';
 			break;
+        case '蒙古语':
+            $language = 'MN';
+            break;
 		default:
 			$language = 'OL';
 			break;
 	}
 	if($infoclass=='') return false;
+    if($codename!=null){
+        $infoclass = trim($codename);
+    }
 	$identifier	= array(
 		$infoclass,
 		$source.$date,
@@ -1394,7 +1423,7 @@ function generate_identifier($postid){
 	$identifier	 = array_filter($identifier);
 	$identifier	= implode('-',$identifier);
 	//$identifier = $infoclass .'-'.$source.$date.'-'.$symbol.str_pad($serial, 2, '0', STR_PAD_LEFT).$rate.'-'.$sale_name.'-'.$language.'-'.$country;
-	return post_edit($postid,array( 'identifier' => strtoupper($identifier) ));
+	return post_edit($postid,array( 'identifier' => mb_strtoupper($identifier, 'utf-8') ));
 }
 
 /**
@@ -1719,7 +1748,8 @@ function determine_url($url, $type, $result=null) {
 		$url = 'http://' . $url;
 	}
 	if(strrpos($url, "@")!==false){
-        $url = str_replace('@','.',$url);
+        return null;
+        //$url = str_replace('@','.',$url);
     }
 	if(strrpos($url,"translate.googleusercontent.com")!==false){
 		parse_str($url);
@@ -1733,6 +1763,9 @@ function determine_url($url, $type, $result=null) {
             parse_str($url_parse['query'],$path_array);
             if(isset($path_array['sa']) && $path_array['sa']=='t' && isset($path_array['url'])){
                 $url = $path_array['url'];
+            }
+            if(isset($path_array['lite_url'])){
+                $url = $path_array['lite_url'];
             }
         } 
     }
@@ -1787,7 +1820,10 @@ function re_determine_url($days=90) {
 	set_time_limit(0);
 	if($result){
 		while ($data = $db->fetch($result)) {
-			set_time_limit(0);
+			echo 'now url is: '.$data['landingurl'];
+            // ob_flush();
+            // flush();
+
 			$new = determine_url($data['landingurl'],'网站所属人');
 			if($data['landingurl']!=$new && $new!==false)
 				post_edit($data['postid'],array('belong'=>$new));
@@ -2021,13 +2057,30 @@ function test_result($state) {
  * 获取所有联系人名字
  *
  */
-function get_all_contact(){
+function get_all_contact($sortid=0){
 	$db = get_conn(); $result = array();
-	$rs = $db->query("SELECT `name` FROM `#@_contact`;");
+    $sql = "SELECT `name` FROM `#@_contact`;";
+    if($sortid && defined('DB_DSN') && defined('DB_USER') && defined('DB_PWD') && DB_USER){
+        $parentid = get_top_sortid($sortid);
+        $sql = "SELECT `name` FROM `#@_contact` WHERE '$sortid' in (`category`) or '$parentid' in (`category`);";
+    }
+	$rs = $db->query($sql);
 	while ($row = $db->fetch($rs)) {
 		$result[] = $row['name'];
     }
 	return $result;
+}
+
+function get_top_sortid($taxonomyid){
+    $sort = taxonomy_get($taxonomyid);
+    $parentid = $sort['parent'];
+    if($parentid){
+        $parentid = $sort['parent'];
+        return get_top_sortid($parentid);
+    }else{
+        return $sort['taxonomyid'];
+    }
+    return $parentid;
 }
 
 /**
@@ -2599,7 +2652,7 @@ function get_inqiury_info($type='inquiry',$inforate=null,$days=30){
 
 function get_recent_inqiury($inforate=null,$days=30,$type='inquiry'){
 	$db = get_conn();global $_USER;
-	$name = $_USER['nickname'];
+	$name = $_USER['name'];
 	$where = " WHERE FROM_UNIXTIME(`addtime`) BETWEEN DATE_SUB(NOW(), INTERVAL $days DAY)";
     $where = " WHERE date_format(FROM_UNIXTIME(`addtime`),'%Y-%m')=date_format(now(),'%Y-%m')"; //当前月数据
 	$where .= sprintf(" AND `type`='%s' AND `belong`<>'' AND `belong`='%s'",$type,$name);
@@ -2618,7 +2671,7 @@ function get_recent_inqiury($inforate=null,$days=30,$type='inquiry'){
 
 function get_recent_inqiury_info($type='inquiry',$inforate=null,$days=30){
 	global $_USER;
-	$name = $_USER['nickname'];
+	$name = $_USER['name'];
 	$info_per_day = array(
 		array(
 			"type"	=>'ALL',
@@ -2639,11 +2692,23 @@ function get_recent_inqiury_info($type='inquiry',$inforate=null,$days=30){
 			"data"  => get_recent_inqiury('B')
 		),
 		array(
-			"type"	=>'C',
-			"label" => $name.'的C类询盘',
+			"type"	=>'C+',
+			"label" => $name.'的C+类询盘',
 			"color" => "#319400",
-			"data"  => get_recent_inqiury('C')
-		)
+			"data"  => get_recent_inqiury('C+')
+		),
+                        array(
+                            "type"  =>'C',
+                            "label" => $name.'的C类询盘',
+                            "color" => "#319401",
+                            "data"  => get_recent_inqiury('C')
+                        ),
+                        array(
+                            "type"  =>'C-',
+                            "label" => $name.'的C-类询盘',
+                            "color" => "#319402",
+                            "data"  => get_recent_inqiury('C-')
+                        )
 	);
 	return $info_per_day;
 }
