@@ -2,6 +2,7 @@
 defined('COM_PATH') or die('Restricted access!');
 // 加载父类
 include_file(dirname(__FILE__).'/abs_mysql.php');
+error_reporting(E_ALL);
 /**
  * mysqli 访问类
  *
@@ -127,6 +128,8 @@ class DB_Mysqli extends DBQuery {
                 }
             }
         }
+        // print_r($result);
+        // setCache(md5("mysqli_query" . $sql), $result);
         return $result;
     }
     /**

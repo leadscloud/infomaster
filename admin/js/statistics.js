@@ -46,9 +46,9 @@ $(document).ready(function(){
 		$('html, body').animate({scrollTop: yourTop.top-82}, "slow");
 
 	//enjoy it
-	setInterval(function() {
-		GetWords()
-	}, 15000);
+	// setInterval(function() {
+	// 	GetWords()
+	// }, 15000);
 	function GetWords() {
 		$.ajax({
             url: "statistics.php",

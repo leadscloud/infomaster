@@ -7,7 +7,6 @@ current_user_can('cpanel');
 // 动作
 $method = isset($_REQUEST['method'])?$_REQUEST['method']:null;
 system_class('body','dashboard');
-
 //system_head('scripts',array('js/charts'));
 
 //print_r(get_inqiury_info('inquiry',null,30));
@@ -57,16 +56,16 @@ switch ($method) {
 		echo '<div class="module-header">';
 		echo	'<h3><i class="icon-trophy"></i> 询盘所属人概览</h3>';
 		echo '</div>';
-		
+
 		echo '<div class="alert alert-warning hidden-print"><i class="icon-bullhorn"></i> <span id="somewords">友情提醒：本数据仅供参考，如果询盘数高于实际发布，建议以实际发布为准(也许计算错了)， 以下排序按照总有效询盘数。</span></div>';
 
-		
+
 		echo   '<div class="row-fluid printable">';
 		echo     '<div class="span12">';
 		echo       '<div class="widget-box">';
 		echo         '<div class="widget-title">';
 
-		
+
 
 		echo           '<span class="icon"><i class="icon-bar-chart"></i></span>';
 		//echo           '<h5>最近'.$days.'天询盘情况</h5>';
@@ -76,7 +75,7 @@ switch ($method) {
 		echo '</div>';
 		echo           '<div class="buttons hidden-print"><a href="#" class="btn btn-mini btn-expandall hidden-phone"><i class="icon-double-angle-down"></i> 展开所有</a>';
 
-		
+
 
 		//echo             '<a href="'.add_query_arg('days','30').'" class="btn btn-mini"><i class="icon-refresh"></i> 最近30天</a>';
 		if($orderby=='totalvaild')
@@ -105,9 +104,12 @@ switch ($method) {
 		echo 			'</thead>';
 
 
-		
+
 
 		$where = 'WHERE `type`="inquiry" AND (`xp_status`="" OR `xp_status`="冲突") AND (`source`="商务通" OR `source`="网站留言")';
+
+		// 郑州的询盘不显示
+		// $where.= ' AND `infoclass` <> "郑州SEO技术人员" ';
 
 		if ($startdate) {
 			$conditions[] = sprintf("`addtime` > '%s'",esc_sql($startdate));
@@ -145,7 +147,7 @@ switch ($method) {
 				            if(isset($path_array['sa']) && $path_array['sa']=='t' && isset($path_array['url'])){
 				                $url = $path_array['url'];
 				            }
-				        } 
+				        }
 				    }
 				}
 
@@ -153,7 +155,7 @@ switch ($method) {
             	$host 	= $parser->get_host();
             	$host 	= preg_replace('/^www./','',$host); //www开头的都替换掉。
             	$collect[$data['belong']]['host'][$host][$data['inforate']][] = $data['landingurl'];
-                
+
                 // if host is not empty, re_determine_url
                 /**
                 if(current_user_can('belong-detail',false)) {
@@ -169,8 +171,8 @@ switch ($method) {
                 }
                 }
                 */
-                
-                
+
+
 			}
 		}
 
@@ -179,7 +181,7 @@ switch ($method) {
 		}else{
 			$count_sql = "SELECT COUNT(`postid`) as post_count, `inforate`,`landingurl`, `belong` FROM `#@_post` WHERE  FROM_UNIXTIME(`addtime`) >= DATE_ADD(CURDATE(), INTERVAL -{$days} DAY) AND `type`='inquiry' AND (`xp_status`='' OR `xp_status`='冲突') AND (`source`='商务通' OR `source`='网站留言') GROUP BY `belong`,`inforate` order by post_count DESC, `inforate` DESC";
 		}
-        
+
         $domain_conditions = array();
         $domain_where = 'WHERE `status`="approved" ';
         if ($startdate) {
@@ -188,7 +190,7 @@ switch ($method) {
 		if ($enddate) {
 			$domain_conditions[] = sprintf("`addtime` < FROM_UNIXTIME('%s')",esc_sql($enddate));
 		}
-        
+
         if($domain_conditions) {
 			$domain_where.= ' AND '.implode(' AND ' , $domain_conditions);
 		}else{
@@ -201,7 +203,7 @@ switch ($method) {
 				$collect[$data['author']]['count']['domain'] = $data['domain_count'];
 			}
 		}
-        
+
         $domain_sql2 = "SELECT COUNT(`id`) as domain_count, `author` FROM `#@_domain` {$domain_where} AND (`domain` LIKE '%.ga%' OR `domain` LIKE '%.cf%' OR `domain` LIKE '%.tk%' OR `domain` LIKE '%.gq%') GROUP BY `author`";
         $domain_result2 = $db->query($domain_sql2);
         if ($domain_result2) {
@@ -210,7 +212,7 @@ switch ($method) {
 			}
 		}
 
-		
+
 		$count_result = $db->query($count_sql);
 		if ($count_result) {
             while ($data = $db->fetch($count_result)) {
@@ -224,7 +226,7 @@ switch ($method) {
 				$collect[key($collect)]['host']=array();
 			}
 		}
-        
+
         $disable_user_query = $db->query("select `name` FROM `#@_user` WHERE `status`=1 ");
         $disable_user = array();
         while ($data = $db->fetch($disable_user_query)) {
@@ -239,21 +241,21 @@ switch ($method) {
             $count_c = isset($collect[$name]['count']['C'])?$collect[$name]['count']['C']:0;
             $count_c1 = isset($collect[$name]['count']['C+'])?$collect[$name]['count']['C+']:0;
 			$count_c2 = isset($collect[$name]['count']['C-'])?$collect[$name]['count']['C-']:0;
-			$collect[$name]['count']['totalvaild'] = $count_a + $count_b + $count_c + $count_c1; //有效询盘总数			
+			$collect[$name]['count']['totalvaild'] = $count_a + $count_b + $count_c + $count_c1; //有效询盘总数
 		}
 
 		if($orderby=='totalvaild')
 			aasort($collect,"totalvaild");
 		elseif($orderby=='total')
 			aasort($collect,"total");
-		
+
 
 		$number = 1;
-        $deny_name = array("竞价网站", "SNS推广", "邮件营销", "小语种", "西芝", "世邦");
+        $deny_name = array("竞价网站", "SNS推广", "邮件营销", "小语种", "西芝", "世邦", "岳静丽", "耿二轩", "张九杰", "马永红", "黄儒卿", "谢亚丹", "马芳", "刘鹏雁", "张扬涛", "高莹莹", "张文波", "牛永亮", "常文哲"); //, "张晓燕"
         $pm_name = array('岳静丽', '刘鹏雁', '张九杰', '马芳', '耿二轩', '谢亚丹', '黄儒卿', '马永红');
 
         $deny_name = array_merge($deny_name, $pm_name);
-		
+
 		$inquiryData=array();
         if(current_user_can('belong-detail',false)) {
             log_belong_details($_USER['userid']);
@@ -263,18 +265,18 @@ switch ($method) {
 			$total_a = isset($data['count']['A'])?$data['count']['A']:null;
 			$total_b = isset($data['count']['B'])?$data['count']['B']:null;
 			$total_c = isset($data['count']['C'])?$data['count']['C']:null;
-            $total_c1 = isset($data['count']['C+'])?$data['count']['C+']:null;
-            $total_c2 = isset($data['count']['C-'])?$data['count']['C-']:null;
+      $total_c1 = isset($data['count']['C+'])?$data['count']['C+']:null;
+      $total_c2 = isset($data['count']['C-'])?$data['count']['C-']:null;
 			$total_d = isset($data['count']['D'])?$data['count']['D']:null;
 			$total_e = isset($data['count']['E'])?$data['count']['E']:null;
 
 			$total = isset($data['count']['total'])?$data['count']['total']:0;
 			$totalvaild = isset($data['count']['totalvaild'])?$data['count']['totalvaild']:0;
-            
-            $domain_count = isset($data['count']['domain'])?$data['count']['domain']:0;
-            $domain_count_free = isset($data['count']['domain_free'])?$data['count']['domain_free']:0;
-            
-            
+
+      $domain_count = isset($data['count']['domain'])?$data['count']['domain']:0;
+      $domain_count_free = isset($data['count']['domain_free'])?$data['count']['domain_free']:0;
+
+
 			if($total!=0) {
 				$percentage = $totalvaild/$total;
 			}else{
@@ -283,19 +285,19 @@ switch ($method) {
 
 			if(!empty($name) && $total > 10 && !in_array($name, $deny_name)){
 				array_push($inquiryData, array('Name' => $name, 'data'=>array(
-					'A' => intval($total_a), 
-					'B' => intval($total_b), 
+					'A' => intval($total_a),
+					'B' => intval($total_b),
                     'C1' => intval($total_c1),
 					'C' => intval($total_c),
-                    'C2' => intval($total_c2), 
-					'D' => intval($total_d),  
+                    'C2' => intval($total_c2),
+					'D' => intval($total_d),
 					'E' => intval($total_e)
 				)));
 			}
 
-			
 
-			
+
+
 			$percent_friendly = number_format( $percentage * 100, 2 ) . '%';
 
 			$cur_user = user_get_byname($name);
@@ -317,9 +319,9 @@ switch ($method) {
                 $special_icon = '<i class="icon-trophy blink" style="'.$award_color.'"></i>';
                 $style_count++;
             }
-            
-            
-            
+
+
+
             if($total < 1){
                 continue;
             }
@@ -330,7 +332,14 @@ switch ($method) {
                 }
             }
             if($contiue) continue;
-            
+
+						// 针对郑州的设置，测试用
+						$can_see_user = array("杨新鹏", "王国华");
+						$dont_show_user = array("库亚飞", "朱少锋", "张晓燕", "赵双", "申庆", "牛永亮", "常文哲", "张雷", "冯建会", "孙冰", "欧本林", "岳静丽", "耿二轩", "张九杰", "马永红", "黄儒卿", "谢亚丹", "马芳", "刘鹏雁", "张扬涛", "高莹莹", "张文波");
+						if (!current_user_can('ALL',false) && in_array($name, $dont_show_user) && !in_array($_USER["username"], $dont_show_user) && !in_array($_USER["username"], $can_see_user)) {
+							continue;
+						}
+
             $html_domain_count = '';
             $icon_html = '<i class="icon-circle" data-toggle="icon-circle-blank"></i> ';
             if(current_user_can('belong-detail',false) || $_USER['name'] == '朱海龙' || $_USER['workplace'] == '郑州') {
@@ -339,27 +348,25 @@ switch ($method) {
             if(current_user_can('belong-detail',false)){
                 $icon_html = '<i class="icon-plus" data-toggle="icon-minus"></i> ';
             }
-            
-                
+
+
 			echo '<tr data-name="'.$name.'" style="'.$style.'">';
 			echo   '<td>'.(in_array($name, $deny_name)||$name==""?'':$number).'</td>';
-            $score_total = $total_a*100 + $total_b*50 + ($total_c1 + $total_c)*10;
+      $score_total = $total_a*100 + $total_b*50 + ($total_c1 + $total_c)*10;
 			echo   '<td><b title="'.$percent_friendly.'" score="'.$score_total.'">'.$icon_html.$special_icon.' <span>'.$name.'</span>  ('.$totalvaild.'/'.$total.')</b><small class="muted"> '.$workplace.'  (¥'.$score_total.$html_domain_count.')</small></td>';
 			echo   '<td><b>'.$total_a.'</b></td>';
 			echo   '<td><b>'.$total_b.'</b></td>';
-            echo   '<td><b>'.$total_c1.'</b></td>';
+      echo   '<td><b>'.$total_c1.'</b></td>';
 			echo   '<td><b>'.$total_c.'</b></td>';
-            echo   '<td><b>'.$total_c2.'</b></td>';
+      echo   '<td><b>'.$total_c2.'</b></td>';
 			// echo   '<td><b>'.$total_d.'</b></td>';
 			// echo   '<td><b>'.$total_e.'</b></td>';
 			echo '</tr>';
 			echo '</thead>';
-			
+
 			echo '<tbody class="data-detail">';
-            $permission_user = array('王国华', '杨新鹏', '张雷', "张晓燕", "朱少锋", "赵双", "申庆", "库亚飞", "岳静丽", "耿二轩");
-            
-            
-            
+            $permission_user = array('王国华', '杨新鹏', '张雷', "张晓燕", "朱少锋", "赵双", "申庆", "库亚飞", "岳静丽", "耿二轩", "牛永亮", "常文哲", "张扬涛", "高莹莹", "张文波");
+
             if(current_user_can('belong-detail',false) || $_USER['name'] == $name || empty($name) || $name=="竞价网站"
                 ||in_array($_USER['name'], $permission_user)){
                 $sub_index = 0;
@@ -391,7 +398,7 @@ switch ($method) {
                echo '</tr>';
             }
 			echo '</tbody>';
-            if (!in_array($name, $deny_name) && $name != '') {                          
+            if (!in_array($name, $deny_name) && $name != '') {
                 $number++;
             }
 
@@ -459,7 +466,7 @@ rect:hover {  fill:blue; }
 }
 
 </style>';
-		
+
 		echo '<script src="http://d3js.org/d3.v3.min.js"></script>';
 		echo '<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>';
 		echo "<script>var inquiryDataJson='" . json_encode($inquiryData). "';</script>";
@@ -468,16 +475,16 @@ rect:hover {  fill:blue; }
     var barColor = "steelblue";
     //function segColor(c){ return {A:"#499675", B:"#61A977",C1:"#7EBC76", C:"#7EBC76", C2:"#7EBC76", D:"#C6DE72", E:"#F0ED73"}[c]; }
     function segColor(c){ return {A:"#109618", B:"#3366cc",C1:"#E81CAB", C:"#ff9900", C2:"#FFDE80", D:"#990099", E:"#dc3912"}[c]; }
-    
+
     // compute total for each state.
     fData.forEach(function(d){d.total=d.data.A+d.data.B+d.data.C1+d.data.C+d.data.C2+d.data.D+d.data.E;});
-    
+
     // function to handle histogram.
     function histoGram(fD){
         var hG={},    hGDim = {t: 60, r: 0, b: 30, l: 40};
-        hGDim.w = 900 - hGDim.l - hGDim.r, 
+        hGDim.w = 900 - hGDim.l - hGDim.r,
         hGDim.h = 500 - hGDim.t - hGDim.b;
-            
+
         //create svg for histogram.
         var hGsvg = d3.select(id).append("svg")
             .attr("width", hGDim.w + hGDim.l + hGDim.r)
@@ -524,8 +531,8 @@ rect:hover {  fill:blue; }
 
         bars.call(tip);
 
-        
-        
+
+
         //create the rectangles.
         bars.append("rect")
             .attr("x", function(d) { return x(d[0]); })
@@ -535,38 +542,38 @@ rect:hover {  fill:blue; }
             .attr("fill",barColor)
             .on("mouseover",mouseover)// mouseover is defined below.
             .on("mouseout",mouseout);// mouseout is defined below.
-            
+
         //Create the frequency labels above the rectangles.
         bars.append("text").text(function(d){ return d3.format(",")(d[1])})
             .attr("x", function(d) { return x(d[0])+x.rangeBand()/2; })
             .attr("y", function(d) { return y(d[1])-5; })
             .attr("text-anchor", "middle");
 
-        
+
         function mouseover(d){ tip.show(d); // utility function to be called on mouseover.
             // filter for selected state.
             var st = fData.filter(function(s){ return s.Name == d[0];})[0],
                 nD = d3.keys(st.data).map(function(s){ return {type:s, data:st.data[s]};});
-               
-            // call update functions of pie-chart and legend.    
+
+            // call update functions of pie-chart and legend.
             pC.update(nD);
             leg.update(nD);
         }
-        
+
         function mouseout(d){   tip.hide(); // utility function to be called on mouseout.
-            // reset the pie-chart and legend.    
+            // reset the pie-chart and legend.
             pC.update(tF);
             leg.update(tF);
         }
-        
+
         // create function to update the bars. This will be used by pie-chart.
         hG.update = function(nD, color){
             // update the domain of the y-axis map to reflect change in frequencies.
             y.domain([0, d3.max(nD, function(d) { return d[1]; })]);
-            
+
             // Attach the new data to the bars.
             var bars = hGsvg.selectAll(".bar").data(nD);
-            
+
             // transition the height and color of rectangles.
             bars.select("rect").transition().duration(500)
                 .attr("y", function(d) {return y(d[1]); })
@@ -576,21 +583,21 @@ rect:hover {  fill:blue; }
             // transition the frequency labels location and change value.
             bars.select("text").transition().duration(500)
                 .text(function(d){ return d3.format(",")(d[1])})
-                .attr("y", function(d) {return y(d[1])-5; });            
-        }        
+                .attr("y", function(d) {return y(d[1])-5; });
+        }
         return hG;
     }
-    
+
     // function to handle pieChart.
     function pieChart(pD){
         var pC ={},    pieDim ={w:250, h: 250};
         pieDim.r = Math.min(pieDim.w, pieDim.h) / 2;
-                
+
         // create svg for pie chart.
         var piesvg = d3.select(id).append("svg")
             .attr("width", pieDim.w).attr("height", pieDim.h).append("g")
             .attr("transform", "translate("+pieDim.w/2+","+pieDim.h/2+")");
-        
+
         // create function to draw the arcs of the pie slices.
         var arc = d3.svg.arc().outerRadius(pieDim.r - 10).innerRadius(0);
 
@@ -607,11 +614,11 @@ rect:hover {  fill:blue; }
         pC.update = function(nD){
             piesvg.selectAll("path").data(pie(nD)).transition().duration(500)
                 .attrTween("d", arcTween);
-        }        
+        }
         // Utility function to be called on mouseover a pie slice.
         function mouseover(d){
             // call the update function of histogram with new data.
-            hG.update(fData.map(function(v){ 
+            hG.update(fData.map(function(v){
                 return [v.Name,v.data[d.data.type]];}),segColor(d.data.type));
         }
         //Utility function to be called on mouseout a pie slice.
@@ -626,25 +633,25 @@ rect:hover {  fill:blue; }
             var i = d3.interpolate(this._current, a);
             this._current = i(0);
             return function(t) { return arc(i(t));    };
-        }    
+        }
         return pC;
     }
-    
+
     // function to handle legend.
     function legend(lD){
         var leg = {};
-            
+
         // create table for legend.
         var legend = d3.select(id).append("table").attr("class","legend");
-        
+
         // create one row per segment.
         var tr = legend.append("tbody").selectAll("tr").data(lD).enter().append("tr");
-            
+
         // create the first column for each segment.
         tr.append("td").append("svg").attr("width", "16").attr("height", "16").append("rect")
             .attr("width", "16").attr("height", "16")
 			.attr("fill",function(d){ return segColor(d.type); });
-            
+
         // create the second column for each segment.
         tr.append("td").text(function(d){ return d.type;});
 
@@ -665,21 +672,21 @@ rect:hover {  fill:blue; }
             l.select(".legendFreq").text(function(d){ return d3.format(",")(d.data);});
 
             // update the percentage column.
-            l.select(".legendPerc").text(function(d){ return getLegend(d,nD);});        
+            l.select(".legendPerc").text(function(d){ return getLegend(d,nD);});
         }
-        
+
         function getLegend(d,aD){ // Utility function to compute percentage.
             return d3.format("%")(d.data/d3.sum(aD.map(function(v){ return v.data; })));
         }
 
         return leg;
     }
-    
+
     // calculate total frequency by segment for all state.
-    var tF = ["A","B","C1","C","C2","D","E"].map(function(d){ 
-        return {type:d, data: d3.sum(fData.map(function(t){ return t.data[d];}))}; 
-    });    
-    
+    var tF = ["A","B","C1","C","C2","D","E"].map(function(d){
+        return {type:d, data: d3.sum(fData.map(function(t){ return t.data[d];}))};
+    });
+
     // calculate total frequency by state for all segment.
     var sF = fData.map(function(d){return [d.Name,d.total];});
 
@@ -691,30 +698,30 @@ rect:hover {  fill:blue; }
 </script>';
 
 
-		
+
 		echo         '</div>';
 		echo       '</div>';
 		echo '<div id="dashboard" class="hidden-phone hidden-tablet"></div>';
 		echo '<script>dashboard("#dashboard",inquiryData);</script>';
 		echo     '</div>';
 		echo   '</div>';
-		
+
 		// 加载尾部
         include ADMIN_PATH.'/admin-footer.php';
 		break;
 }
 
-function count_recursive ($array, $limit) { 
-    $count = 0; 
-    if(!is_array ($array)) return $count; 
-    foreach ($array as $id => $_array) { 
-        if (is_array ($_array) && $limit > 0) { 
-            $count += count_recursive ($_array, $limit - 1); 
-        } else { 
-            $count += 1; 
-        } 
-    } 
-    return $count; 
+function count_recursive ($array, $limit) {
+    $count = 0;
+    if(!is_array ($array)) return $count;
+    foreach ($array as $id => $_array) {
+        if (is_array ($_array) && $limit > 0) {
+            $count += count_recursive ($_array, $limit - 1);
+        } else {
+            $count += 1;
+        }
+    }
+    return $count;
 }
 
 function aasort (&$array, $key) {
@@ -733,7 +740,7 @@ function aasort (&$array, $key) {
 
 function getSomeSentence(){
 
-$someSentence = '如果遇到加载网页卡，请设置下自己的头像，或者把你的浏览器设置为自动翻墙。
+$someSentence = '域名请添加到域名管理里，不要添加到规则中，二级域名属于自己的话不用添加到规则中。
 询盘数目统计日期以询盘日期计算，重复及冲突询盘不计数。
 统计来源，只统计商务通和网站留言，直接来信等其它方式来的询盘不计数。';
 

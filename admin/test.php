@@ -1,24 +1,27 @@
 <?php
-/**
- * 测试页面
- */
-// 文件名
-$php_file = isset($php_file) ? $php_file : 'domain.php';
-// 加载公共文件
-include dirname(__FILE__).'/admin.php';
-// 查询管理员信息
-$_USER = user_current();
+	$memcache = new Memcache;
+$memcache->connect("localhost",11211); # You might need to set "localhost" to "127.0.0.1"
 
-$domain = '192.168.1.1';
-$url = '192.168.1.1';
-echo preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/',$url);
-echo '------<br>';
 
-$url    = new parseURL($domain);
 
-print_r($url);
+echo "Server's version: " . $memcache->getVersion() . "\n";
 
-// echo $url->host;
-$domain = $url->getRegisterableDomain();
 
-echo $domain;
+
+$tmp_object = new stdClass;
+
+$tmp_object->str_attr = "test";
+
+$tmp_object->int_attr = 123;
+
+
+
+$memcache->set("key",$tmp_object,false,10);
+
+echo "Store data in the cache (data will expire in 10 seconds)\n";
+
+
+
+echo "Data from the cache:\n";
+
+var_dump($memcache->get("key"));

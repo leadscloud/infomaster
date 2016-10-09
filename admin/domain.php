@@ -33,11 +33,11 @@ switch ($method) {
     			system_head('title', '批量添加域名');
     			domain_manage_page('bulk-add');
     			break;
-    		
+
     		default:
     			domain_manage_page('add');
     			break;
-    	}    
+    	}
 	    include ADMIN_PATH.'/admin-footer.php';
 	    break;
 	// 编辑
@@ -49,7 +49,7 @@ switch ($method) {
         system_head('scripts',array('js/domain'));
 	    system_head('loadevents','domain_manage_init');
 	    include ADMIN_PATH.'/admin-header.php';
-	    domain_manage_page('edit');	    
+	    domain_manage_page('edit');
 	    include ADMIN_PATH.'/admin-footer.php';
 	    break;
 	case 'unapprove':
@@ -86,7 +86,7 @@ switch ($method) {
 	    	ajax_error('你没有选择任何项目。');
 	    }
 		current_user_can('domain-trash');
-		
+
 		foreach ($listids as $id) {
 			trash_domain($id);
 			$result ='域名信息已放入回收站';
@@ -97,7 +97,7 @@ switch ($method) {
 		$listids = isset($_POST['listids'])?$_POST['listids']:null;
 	    if (empty($listids)) {
 	    	ajax_error('你没有选择任何项目。');
-	    }		
+	    }
 		foreach ($listids as $id) {
 			status_domain($id, 'wantdelete');
 		}
@@ -107,7 +107,7 @@ switch ($method) {
 		$listids = isset($_POST['listids'])?$_POST['listids']:null;
 	    if (empty($listids)) {
 	    	ajax_error('你没有选择任何项目。');
-	    }		
+	    }
 		foreach ($listids as $id) {
 			status_domain($id, 'pending');
 		}
@@ -122,7 +122,7 @@ switch ($method) {
 	    	ajax_error('你没有选择任何项目。');
 	    }
 		current_user_can('domain-delete');
-		
+
 		foreach ($listids as $id) {
 			if('domainmeta'==$action){
 				domain_meta_delete($id);
@@ -169,7 +169,7 @@ switch ($method) {
 				$objSheet->SetCellValue('I'.$rowCount, $row['marker']);
 				$objSheet->SetCellValue('J'.$rowCount, $row['addtime']);
 
-				$rowCount++; 
+				$rowCount++;
 			}
 			//列宽
 			$objSheet->getColumnDimension('A')->setWidth(50);
@@ -194,7 +194,7 @@ switch ($method) {
 	    current_user_can($domainid?'domain-edit':'domain-new');
         if (validate_is_post()) {
             $referer  = referer(PHP_FILE,false);
-			
+
 			$author				= isset($_POST['author'])?$_POST['author']:null;
     		$domain  			= isset($_POST['domain'])?$_POST['domain']:null;
     		$registrationdate   = isset($_POST['registrationdate'])?$_POST['registrationdate']:null;
@@ -214,7 +214,7 @@ switch ($method) {
 			$language 			= isset($_POST['language'])?$_POST['language']:null;
 			$marker 			= isset($_POST['marker'])?$_POST['marker']:null;
 			$groupid 			= isset($_POST['groupid'])?$_POST['groupid']:null;
-			
+
 			//访问信息
 			$type		= isset($_POST['info_type'])?$_POST['info_type']:null;
 			$username	= isset($_POST['username2'])?$_POST['username2']:null;
@@ -223,11 +223,11 @@ switch ($method) {
 			$dbname		= isset($_POST['database2'])?$_POST['database2']:null;
 			$notes		= isset($_POST['notes2'])?$_POST['notes2']:null;
 			$editaccess = isset($_POST['editAccess'])?$_POST['editAccess']:null;
-			
+
 			$user = user_get_byname($author);
 			$userid = isset($user['userid'])?$user['userid']:null;
-			
-			
+
+
 			if($domainid && $editaccess == 'yes') {
 				validate_check('username2',VALIDATE_EMPTY,'用户名不能为空');
 				validate_check('password2',VALIDATE_EMPTY,'密码不能为空.');
@@ -238,13 +238,13 @@ switch ($method) {
 			$is_ip = preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/',$domain);
 
 			if(!$is_ip){
-				
+
 				$url 	= new parseURL($domain);
 				$domain = $url->getRegisterableDomain();
 			}
-			
+
 			//validate_check('domain',VALIDATE_EMPTY,'你必须输入一个域名');
-			
+
 			if (validate_is_ok()) {
 				//if not supply whois
 				if(($expirationdate==null || $expirationdate=='0000-00-00 00:00:00') && !$is_ip){
@@ -296,10 +296,10 @@ switch ($method) {
 					'groupid'			=> $groupid,
 
 				);
-				
+
 				//访问信息
 				if($domainid && $editaccess == 'yes') {
-					
+
 					//添加域名访问信息
 					$meta	= array(
 						'type'		=> $type,
@@ -321,19 +321,19 @@ switch ($method) {
 					}
 					// 强力插入
 					else {
-						
+
 						if ($domain = domain_add($domain,$data)) {
 							$domainid = $domain['id'];
 							$result = '域名添加成功.';
 						} else {
-							$result = '域名添加失败，可能域名已经存在。'.serialize($domain);
+							$result = '域名添加失败，可能域名已经存在。';
 						}
-						
+
 					}
 				}
-				
-				
-				
+
+
+
 				ajax_success($result, "InfoSYS.redirect('".$referer."');");
 			}
 
@@ -351,8 +351,8 @@ switch ($method) {
 		$files = $upload_handler->get(false);
 		$filename = $files['files'][0]->name;
 		*/
-		//$type = $_POST['mimetype']; 
-    	$xhr = $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'; 
+		//$type = $_POST['mimetype'];
+    	$xhr = $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
 
     	if ( !isset($_FILES['importFile']) ) {
 			$file['error'] = '文件是空的。';
@@ -362,33 +362,33 @@ switch ($method) {
 			echo json_encode($status);
 			exit();
 		}
-		
+
 		$tmp_file = $_FILES["importFile"]["tmp_name"];
 		$file_types = explode ( ".", $_FILES ['importFile'] ['name'] );
 		$file_type = $file_types [count ( $file_types ) - 1];
 
 		/*判别是不是.xls文件，判别是不是excel文件*/
-		if (strtolower ( $file_type ) != "xls")              
+		if (strtolower ( $file_type ) != "xls")
 		{
 			$status['status'] = false;
 			$status['message'] = "文件格式不对，请上传.xls的Excel文件。";
 			echo json_encode($status);
 			exit();
-		
+
 		}
 
 		include_file(COM_PATH.'/system/Excel/PHPExcel.php');
-		$objReader = PHPExcel_IOFactory::createReader('Excel5'); 
-		$objReader->setReadDataOnly(true); 
-		$objPHPExcel = $objReader->load($tmp_file); 
-		$objWorksheet = $objPHPExcel->getActiveSheet(); 
-		
-		$highestRow = $objWorksheet->getHighestRow(); 
-		$highestColumn = $objWorksheet->getHighestColumn(); 
-		$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn); 
-		$excelData = array(); 
+		$objReader = PHPExcel_IOFactory::createReader('Excel5');
+		$objReader->setReadDataOnly(true);
+		$objPHPExcel = $objReader->load($tmp_file);
+		$objWorksheet = $objPHPExcel->getActiveSheet();
 
-		for ($row = 2; $row <= $highestRow; $row++) { 
+		$highestRow = $objWorksheet->getHighestRow();
+		$highestColumn = $objWorksheet->getHighestColumn();
+		$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+		$excelData = array();
+
+		for ($row = 2; $row <= $highestRow; $row++) {
 			for ($col = 0; $col < $highestColumnIndex; $col++) {
 				$field = (string)$objWorksheet->getCellByColumnAndRow($col, 1)->getValue();
 				if($field!=null)
@@ -406,36 +406,44 @@ switch ($method) {
 
 		ajax_success('域名导入成功。');
 
-    	//if ($type == 'json') { 
+    	//if ($type == 'json') {
         	//header('Content-type: text/xml');
-        //var_dump($_POST); 
-        foreach($_FILES as $file) { 
-            $n = $file['name']; 
-            $s = $file['size']; 
-            if (!$n) continue; 
-            echo "File: $n ($s bytes)"; 
-        } 
+        //var_dump($_POST);
+        foreach($_FILES as $file) {
+            $n = $file['name'];
+            $s = $file['size'];
+            if (!$n) continue;
+            echo "File: $n ($s bytes)";
+        }
 
 		break;
 	// 默认
 	default:
 		current_user_can('domain-list');
 		system_head('title',  '域名管理');
-		system_head('scripts',array('js/jquery.form')); // 
+		system_head('scripts',array('js/jquery.form')); //
 		system_head('scripts',array('js/domain'));
-	    system_head('loadevents','domain_list_init');
+	  system_head('loadevents','domain_list_init');
 		$domain_count = domain_count();
 		$search   = isset($_REQUEST['query'])?$_REQUEST['query']:'';
 		$query    = array('page' => '$');
 		$type 	  = isset($_REQUEST['type'])?$_REQUEST['type']:'';
 		// 排序方式
 		$order =  'ASC';
-		
+
 		$conditions = array();
 		$where = "WHERE 1";
 		$is_domain_admin = current_user_can('domain-admin',false);
+    // 设置为只有超级管理员可以看
 		if(!current_user_can('ALL',false) && !$is_domain_admin)
 			$where.= ' AND `userid`='.$_USER['userid'];
+
+    $zz_user = array("杨新鹏", "王国华", "库亚飞", "朱少锋", "张晓燕", "赵双", "申庆", "牛永亮", "常文哲", "张雷", "冯建会", "孙冰", "欧本林", "岳静丽", "耿二轩");
+    // print_r($_USER);
+    if(!current_user_can('ALL',false) && $_USER['primary_grp']!=10) {
+      $where.= ' AND `author` not in ("杨新鹏", "王国华", "朱少锋", "张晓燕", "赵双", "申庆", "张雷", "牛永亮", "常文哲")';
+      // $where.= ' AND `addtime` < "2016-5-1 18:00"';
+    }
 
 		if($type){
 		    $query['type'] = $type;
@@ -466,18 +474,18 @@ switch ($method) {
 		}
 		$result = pages_query($sql);
 
-		
+
 
 		$count_expired_result = $db->query("SELECT count(`id`) AS count FROM `#@_domain` WHERE DATE(`expirationdate`) <= DATE_ADD(CURDATE(), INTERVAL + 90 DAY)");
 		$count_expired = $db->fetch($count_expired_result);
-		
+
 
 		// 分页地址
 		$page_url   = PHP_FILE.'?'.http_build_query($query);
-		
+
 		// 加载头部
 		include ADMIN_PATH.'/admin-header.php';
-		
+
 		echo '<div class="module-header">';
 		echo	'<h3><i class="icon-tags"></i> 域名信息</h3>';
 		echo '</div>';
@@ -487,17 +495,17 @@ switch ($method) {
 			echo   "有 <b>".$count_expired['count']."</b> 个域名三个月后即将过期，请通知域名管理人员续费！";
 			echo "</div>";
 		}
-		
-		
+
+
 		echo '<div class="tabbable">';
 		echo	'<ul class="nav nav-tabs">';
 		echo		'<li class="active"><a href="#domains" data-toggle="tab">所有域名 ('.$domain_count.')</a></li>';
 		echo	'</ul>';
 		echo	'<div class="tab-content">';
 		echo		'<div class="tab-pane fade active in" id="domains">';
-		
+
 		table_nav('top',$page_url);
-		
+
 		echo		  '<div class="widget widget-table">';
 		echo		    '<div class="widget-header">';
 		echo			  '<h3><i class="icon-list icon-border"></i> 域名列表</h3>';
@@ -542,13 +550,13 @@ switch ($method) {
 		echo              '</table>';
 		echo            '</div><!--/.widget-content-->';
 		echo          '</div>';
-		
+
 		table_nav('bottom',$page_url);
-		
+
 		echo        '</div>';
 		echo    '</div>';
 		echo '</div><!--/.tabbable-->';
-		
+
 		// 加载尾部
 		include ADMIN_PATH.'/admin-footer.php';
 		break;
@@ -593,13 +601,13 @@ function table_nav($side,$url) {
 	echo	  '<a href="#collapseImport" data-toggle="collapse" class="btn"><i class="icon-upload"></i> 批量导入域名</a>';
 	echo    '</div>';
 	if ($side == 'top') {
-		
+
 		echo '<div class="pull-right btn-group">';
-		
+
 
 		echo 	'<form action="" method="get" class="form-inline" id="formSearch">';
 
-		
+
 		echo '<select name="type" class="span2">';
         echo     '<option value="">查看所有域名</option> ';
         echo     '<option value="pending"'.($type=="pending"?' selected="selected"':"").'>待审核域名</option> ';
@@ -608,7 +616,7 @@ function table_nav($side,$url) {
         echo '</select> ';
 
 		echo ' <div class="input-append"> <input class="span2 search-query" name="query" type="text" value="'.esc_html($search).'"> <button class="btn" type="submit" onclick="javascript:;">搜索</button></div> </form> ';
-	
+
 	echo 	'</div>';
 
 	echo '<div id="collapseImport" class="accordion-body collapse">';
@@ -674,7 +682,7 @@ function domain_manage_page($action) {
 	$groupid			= isset($_DATA['groupid'])?$_DATA['groupid']:null;
 
 	$domain_group_list = domain_group_get_list();
-	
+
 	$is_domain_admin = current_user_can('domain-admin',false);
 	//是否可以管理当前域名
 	if($action!='add'){
@@ -685,7 +693,7 @@ function domain_manage_page($action) {
 	if(!$is_domain_admin && $_USER['usergroup']=='SEO技术人员' && $author !=null && $_USER['name'] != $author){
 		return;
 	}
-	
+
 	echo	'<div class="module-header">';
 	echo		'<h3>';
 	if ($action=='add') {
@@ -695,26 +703,26 @@ function domain_manage_page($action) {
 	}
 	echo		'</h3>';
 	echo	'</div>';
-	
+
 	echo '<div class="row-fluid">';
-	
-	
+
+
 	echo     '<div class="widget">';
 	echo	   '<div class="widget-header">';
 	echo		  '<i class="icon-cog"></i><h3>域名信息</h3>';
 	echo	   '</div>';
 	echo	   '<div class="widget-content">';
-	
+
 	echo         '<form action="'.PHP_FILE.'?method=save" method="post" name="domainmanage" class="form-horizontal form-horizontal-small" id="domainmanage">';
-	
+
 	echo         '<div class="row-fluid">';
-	
+
 	echo         '<div class="span6">';
-	
+
 	echo         '<div class="control-group control-group-mini">';
 	echo           '<label class="control-label">所属人</label>';
 	echo		   '<div class="controls">';
-	
+
 	if(current_user_can('ALL',false) || $is_domain_admin) {
 		echo             '<select name="author" class="chosen">';
 		echo               '<option value="">选择所属人</option>';
@@ -786,7 +794,7 @@ function domain_manage_page($action) {
 	echo           '<label class="control-label">所在组</label>';
 	echo		   '<div class="controls">';
 	echo             '<select name="groupid" class="chosen">';
-	
+
 	echo                '<option value="">-- 域名所在组--</option>';
 	echo 				dropdown_groups($groupid);
 	echo             '</select>';
@@ -864,16 +872,16 @@ function domain_manage_page($action) {
 	echo		     '<textarea class="autosize-transition" name="description">'.$description.'</textarea>';
 	echo		   '</div>';
 	echo         '</div>';
-	
-	
-	
+
+
+
 	echo	     '</div><!---/span-->';
 	echo         '<div class="span6">';
 	echo           '<label>WHOIS信息（请自动获取，获取不到再手工填写）</label>';
 	echo		   '<textarea class="autosize-transition span12" rows="20" name="whois" >'.$whoisdata.'</textarea>';
 	echo         '</div>';
 	echo	   '</div>';
-	
+
 	echo	   '<div class="control-group">';
 	echo		   '<div class="controls">';
 
@@ -889,10 +897,10 @@ function domain_manage_page($action) {
 	echo	      '</div>';
 	echo	     '</div>';
 	echo       '</form>';
-	
+
 	echo	   '</div>';//widet content
 	echo	 '</div>'; //widget\
-	
+
 	echo     '<div class="widget">';
 	echo	   '<div class="widget-header">';
 	echo		  '<i class="icon-cog"></i><h3>访问信息</h3>';
@@ -931,13 +939,13 @@ function domain_manage_page($action) {
 	}
 	echo		    '</tbody>';
 	echo          '</table>';
-	
+
 	echo   '<div class="btn-group">';
 	echo     '<button class="btn"><i class="icon-trash"></i> 删除</button>';
 	echo     '<input type="hidden" name="action" value="domainmeta" />';
 	echo   '</div>';
 	echo   '</form>';
-	
+
 	//
 	echo       '<form action="'.PHP_FILE.'?method=save" method="post" name="domainmanage" class="form-horizontal">';
 	echo         '<fieldset>';
@@ -996,10 +1004,10 @@ function domain_manage_page($action) {
 	echo         '</div>';
 	echo         '</fieldset>';
 	echo       '</form>';
-	
+
 	echo       '</div>';
 	echo	 '</div>';
-	
+
 
 	echo '</div>';
 
@@ -1020,15 +1028,15 @@ function domain_bulk_page($action) {
 	echo	'</h3>';
 	echo '</div>';
 
-	echo '<div class="row-fluid">';	
-	
+	echo '<div class="row-fluid">';
+
 	echo   '<div class="widget">';
 	echo     '<div class="widget-header">';
 	echo       '<i class="icon-cog"></i><h3>域名信息</h3>';
 	echo     '</div>';
 	echo     '<div class="widget-content">';
 	echo     '<form action="'.PHP_FILE.'?method=save" method="post" name="domainmanage" class="form-horizontal form-horizontal-small" id="domainmanage">';
-	
+
 	echo       '<div class="row-fluid">';
 	echo         '<div class="control-group control-group-mini">';
 	echo           '<label class="control-label">备注</label>';
@@ -1076,7 +1084,7 @@ function dropdown_groups($selected=null){
 			$sel  = null;
 		$groupname = $tree['name'];
         $hl.= '<option value="'.$tree['id'].'"'.$sel.'>'.$groupname.'</option>';
-		
+
 	}
 	return $hl;
 }

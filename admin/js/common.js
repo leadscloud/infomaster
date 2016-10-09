@@ -825,9 +825,9 @@ jQuery(function () {
 	var logged = true;
 	var total_messages = 0;
 	RunCheck();
-	setInterval(function() {
-		RunCheck()
-	}, 5000)
+	// setInterval(function() {
+	// 	RunCheck()
+	// }, 5000)
 	function RunCheck() {
 		$.ajax({
             url: baseurl+"ajax_calls.php",

@@ -8,11 +8,11 @@
  * @version 	0.2
  * @author 		Christian Weber <christian@cw-internetdienste.de>
  * @link		http://www.cw-internetdienste.de
- * 
+ *
  *  freely distributable under the MIT Licence
  *
  */
- 
+
 class parseURL {
 	private		$regex	=	'\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))';
 
@@ -29,7 +29,7 @@ class parseURL {
 
 	/**
 	 * __construct function.
-	 * 
+	 *
 	 * @access public
 	 * @param mixed $url
 	 * @return void
@@ -40,7 +40,7 @@ class parseURL {
 		if (empty($schemeMatches)) {
             $url = 'http://' . $url;
         }
-		
+
 		if(!isset($url)	||	empty($url)	||	trim($url) == ''	||	!is_string($url)	||	!$this->check($url)) {	return false; }
 
 		$this->url	=	$url;
@@ -49,7 +49,7 @@ class parseURL {
 
 	/**
 	 * check function.
-	 * 
+	 *
 	 * @access private
 	 * @param mixed $url
 	 * @return void
@@ -60,7 +60,7 @@ class parseURL {
 
 	/**
 	 * parseURL function.
-	 * 
+	 *
 	 * @access private
 	 * @return void
 	 */
@@ -81,7 +81,7 @@ class parseURL {
 
 	/**
 	 * parsePath function.
-	 * 
+	 *
 	 * @access private
 	 * @param mixed $path
 	 * @return void
@@ -101,7 +101,7 @@ class parseURL {
 
 	/**
 	 * parseQuery function.
-	 * 
+	 *
 	 * @access private
 	 * @param mixed $query
 	 * @return void
@@ -124,7 +124,7 @@ class parseURL {
 
 	/**
 	 * get function.
-	 * 
+	 *
 	 * @access public
 	 * @param mixed $type
 	 * @return void
@@ -154,7 +154,7 @@ class parseURL {
     {
     	$list = include COM_PATH.'/system/public-suffix-list.php';
 		$this->publicSuffixList = $list;
-		
+
     	$host = $this->host;
 
         if (strpos($host, '.') === 0) {
@@ -253,7 +253,7 @@ class parseURL {
 
 	/**
 	 * get_url function.
-	 * 
+	 *
 	 * @access public
 	 * @return void
 	 */
@@ -263,7 +263,7 @@ class parseURL {
 
 	/**
 	 * get_protocol function.
-	 * 
+	 *
 	 * @access public
 	 * @return void
 	 */
@@ -273,7 +273,7 @@ class parseURL {
 
 	/**
 	 * get_host function.
-	 * 
+	 *
 	 * @access public
 	 * @return void
 	 */
@@ -283,7 +283,7 @@ class parseURL {
 
 	/**
 	 * get_path function.
-	 * 
+	 *
 	 * @access public
 	 * @return void
 	 */

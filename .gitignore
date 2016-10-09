@@ -11,3 +11,4 @@ test
 *.db
 *.sqlite
 .idea
+chrome/

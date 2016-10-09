@@ -21,159 +21,9 @@ function your_inqiury_count($rate=null){
 }
 
 switch ($method) {
-	case 'report':
-		system_head('title', '询盘概览');
-		system_head('scripts',array('jquery.flot','jquery.flot.pie','jquery.flot.time','jquery.flot.resize','jquery.flot.categories'));
-		system_head('scripts',array('js/recent'));
-		// 加载头部
-		include ADMIN_PATH.'/admin-header.php';
-		echo '<div class="module-header">';
-		echo	'<h3><i class="icon-dashboard"></i> 询盘概览</h3>';
-		echo '</div>';
-		
-		//echo '<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert"><i class="icon-remove"></i></button><i class="icon-umbrella bigger-120 blue"></i> 查看详细询盘所属人概览请点击<a href="statistics.php">这儿</a> , 会具体展示所属人的网址信息，你的询盘从哪些网站过来的，一目了然。</div>';
-		
-		echo   '<div class="row-fluid">';
-		echo     '<div class="span12">';
-		echo       '<div class="widget-box">';
-		echo         '<div class="widget-title"><a href="#collapseStats" data-toggle="collapse">';
-		echo           '<span class="icon"><i class="icon-signal"></i></span>';
-		echo           '<h5>'.date("m").'月询盘信息概览</h5></a>';
-		echo           '<div class="buttons"><a href="#" class="btn btn-mini"><i class="icon-refresh"></i> Update stats</a></div>';
-		echo         '</div>';
-
-		echo        '<div id="collapseStats" class="accordion-body collapse in">';
-		echo         '<div class="widget-content">';
-		echo           '<div class="row-fluid">';
-		echo             '<div class="span4">';
-		echo               '<ul class="site-stats">';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=A&belong='.$_USER['name'].'"><i class="icon-trophy"></i> <strong>'.your_inqiury_count('A').'</strong> <small>A类询盘</small></a></div></li>';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=B&belong='.$_USER['name'].'"><i class="icon-thumbs-up"></i> <strong>'.your_inqiury_count('B').'</strong> <small>B类询盘</small></a></div></li>';
-		echo                 '<li class="divider"></li>';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=C+&belong='.$_USER['name'].'"><i class="icon-heart-empty"></i> <strong>'.your_inqiury_count('C+').'</strong> <small>C+类询盘</small></a></div></li>';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=C&belong='.$_USER['name'].'"><i class="icon-heart-empty"></i> <strong>'.your_inqiury_count('C').'</strong> <small>C类询盘</small></a></div></li>';
-		echo                 '<li><div class="cc"><a href="report.php?inforate=C-&belong='.$_USER['name'].'"><i class="icon-heart-empty"></i> <strong>'.your_inqiury_count('C-').'</strong> <small>C-类询盘</small></a></div></li>';
-		// echo                 '<li><div class="cc"><a href="report.php?inforate=D&belong='.$_USER['nickname'].'"><i class="icon-umbrella"></i> <strong>'.your_inqiury_count('D').'</strong> <small>D类询盘</small></a></div></li>';
-		// echo                 '<li><div class="cc"><a href="report.php?inforate=E&belong='.$_USER['nickname'].'"><i class="icon-warning-sign"></i> <strong>'.your_inqiury_count('E').'</strong> <small>E类询盘</small></a></div></li>';
-		echo               '</ul>';
-		echo             '</div>';
-		echo             '<div class="span8">';
-		echo               '<div class="recent-chart" style="height: 300px;max-width: 100%;"></div>';
-		echo             '</div>';
-		echo           '</div>';
-		echo         '</div>';
-		echo        '</div>'; //end collapse
-		echo       '</div>';
-		echo     '</div>';
-		echo   '</div>';
-		
-		echo   '<div class="row-fluid">';
-		echo     '<div class="span12">';
-		echo       '<div class="widget-box">';
-		echo         '<div class="widget-title"><a href="#collapseBars" data-toggle="collapse">';
-		echo           '<span class="icon"><i class="icon-bar-chart"></i></span>';
-		echo           '<h5>询盘所属人概况 (仅显示30天内询盘数高于30个的)</h5></a>';
-		echo           '<div class="buttons"><a href="#" class="btn btn-mini"><i class="icon-refresh"></i> Update stats</a></div>';
-		echo         '</div>';
-		echo        '<div id="collapseBars" class="accordion-body collapse in">';
-		echo         '<div class="widget-content">';
-		echo           '<div class="bars"></div>';
-		echo         '</div>';
-		echo        '</div>'; //end collapse
-		echo       '</div>';
-		echo     '</div>';
-		echo   '</div>';
-
-		echo   '<div class="row-fluid">';
-
-		echo     '<div class="span12">';
-		echo       '<div class="widget-box widget-chat">';
-		echo         '<div class="widget-title">';
-		echo           '<span class="icon"><i class="icon-comments"></i></span>';
-		echo           '<h5>在线聊天室</h5>';
-		echo           '<div class="buttons"><a href="javascript:;" class="btn btn-mini" onclick="notify(\'test\')">显示桌面通知</a> <a href="#" class="btn btn-mini empty-messages"><i class="icon-refresh"></i> 清空聊天记录</a></div>';
-		echo         '</div>';
-		system_head('scripts',array('js/websocket'));
-		system_head('scripts',array('js/chat'));
-		echo         '<div class="widget-content no-padding">';
-		echo           '<div class="chat-content panel-left">';
-		echo             '<div class="dialogs chat-messages"></div>';
-		echo 			  '<div class="chat-message send">';
-		echo 				  '<div class="input-group">';
-		echo 					  '<input placeholder="在这儿输入你的消息 (ctrl+enter键提交) ..." type="text" class="form-control chat" name="chat">';
-		echo 					  '<span class="input-group-btn">';
-		echo 						  '<button class="btn btn-sm btn-info no-radius submit" type="button"><i class="icon-share-alt"></i> 发送</button>';
-		echo 					  '</span>';
-		echo 				  '</div>';
-		echo 			  '</div>';
-		echo            '</div>';
-		echo            '<div class="chat-users panel-right">';
-		echo              '<div class="panel-title"><h5>在线用户 <span class="online-count badge badge-info">0</span></h5></div>';
-		echo              '<div class="panel-content nopadding list"><ul class="contact-list"></ul></div>';
-		echo            '</div>';
-
-		echo         '</div>';
-		echo       '</div>';
-		echo     '</div>';
-
-
-		echo   '</div>';
-		
-		echo   '<div class="row-fluid">';
-		echo     '<div class="span12">';
-		echo       '<div class="widget-box">';
-		echo         '<div class="widget-title"><a href="#collapseStatus" data-toggle="collapse">';
-		echo           '<span class="icon"><i class="icon-bar-chart"></i></span>';
-		echo           '<h5>最近7天询盘情况</h5></a>';
-		echo           '<div class="buttons"><a href="#" class="btn btn-mini"><i class="icon-refresh"></i> Update stats</a></div>';
-		echo         '</div>';
-		echo        '<div id="collapseStatus" class="accordion-body collapse in">';
-		echo         '<div class="widget-content nopadding">';
-		echo           '<table class="table table-bordered table-striped table-hover">';
-		echo             '<tr>';
-		echo               '<th>所属人</th>';
-		echo               '<th>A类询盘</th>';
-		echo               '<th>B类询盘</th>';
-		echo               '<th>C类询盘</th>';
-		echo               '<th>D类询盘</th>';
-		echo               '<th>E类询盘</th>';
-		echo             '</tr>';
-
-		$db = get_conn();
-		$sql = "SELECT COUNT(`postid`) as post_count, `inforate`,`landingurl`, `belong` FROM `#@_post` WHERE  FROM_UNIXTIME(`datetime`) >= DATE_ADD(CURDATE(), INTERVAL -7 DAY) AND `type`='inquiry' AND `xp_status`='' GROUP BY `belong`,`inforate` order by post_count DESC, `inforate` DESC";
-		$result = $db->query($sql);
-		$collect = array();
-		if ($result) {
-            while ($data = $db->fetch($result)) {
-				
-				$collect[$data['belong']][$data['inforate']] = $data['post_count'];
-			}
-		}
-		foreach($collect as $name=>$detail) {
-			echo '<tr>';
-			echo   '<td>'.$name.'</td>';
-			echo   '<td>'.(isset($detail['A'])?$detail['A']:'').'</td>';
-			echo   '<td>'.(isset($detail['B'])?$detail['B']:'').'</td>';
-			echo   '<td>'.(isset($detail['C'])?$detail['C']:'').'</td>';
-			echo   '<td>'.(isset($detail['D'])?$detail['D']:'').'</td>';
-			echo   '<td>'.(isset($detail['E'])?$detail['E']:'').'</td>';
-			echo '</tr>';
-		}
-		//print_r($collect);
-
-		echo           '</table>';
-		echo         '</div>';
-		echo        '</div>'; //end collapse
-		echo       '</div>';
-		echo     '</div>';
-		echo   '</div>';
-		
-		// 加载尾部
-        include ADMIN_PATH.'/admin-footer.php';
-		break;
 	default:
-		if($_USER['usergroup']=='SEO技术人员'){
-			redirect('index.php?method=report');
+		if($_USER['usergroup']=='SEO技术人员' || $_USER['usergroup']=='郑州SEO技术人员'){
+			redirect('profile.php');
 		}
 		current_user_can('cpanel');
 		$db = get_conn();
@@ -185,7 +35,7 @@ switch ($method) {
 		system_head('scripts',array('js/cpanel'));
 		// 加载头部
         include ADMIN_PATH.'/admin-header.php';
-		
+
 		echo '<div class="module-header">';
 		echo	'<h3><i class="icon-dashboard"></i> 欢迎</h3>';
 		echo	'</div>';
@@ -198,9 +48,9 @@ switch ($method) {
 		echo	'<div class="tab-content">';
 		echo		'<div class="tab-pane active in" id="analytics">';
 		//echo '<div class="widget alert alert-info adjusted"><button class="close" data-dismiss="alert">×</button><i class="cus-exclamation"></i><strong>小提示:</strong>在页面调整大小时如果想看到实时数据，请刷新当前页面。 这只是一个演示页面</div>';
-		
+
 		//echo '<div class="container-fluid">';
-		
+
 		echo   '<div class="row-fluid">';
 		echo     '<div class="span12 center">';
 		echo       '<ul class="stat-boxes">';
@@ -223,7 +73,7 @@ switch ($method) {
 		echo       '</ul>';
 		echo     '</div>';
 		echo   '</div>';
-		
+
 		echo   '<div class="row-fluid">';
 		echo     '<div class="span12">';
 		echo       '<div class="widget-box">';
@@ -254,7 +104,7 @@ switch ($method) {
 		echo       '</div>';
 		echo     '</div>';
 		echo   '</div>';
-		
+
 		echo   '<div class="row-fluid">';
 		echo     '<div class="span6">';
 		echo       '<div class="widget-box">';
@@ -303,9 +153,9 @@ switch ($method) {
 		echo       '</div>';
 		echo     '</div>';
 		echo   '</div>';
-		
-		
-		
+
+
+
 
 		echo		'</div>';
 		echo		'<div class="tab-pane" id="system">';
@@ -351,7 +201,7 @@ switch ($method) {
 		echo					'<tr><td style="width:130px">服务器系统：</td><td>'.PHP_OS .' '. php_uname('r') .' On '. php_uname('m').'</td></tr>';
 		if("show"==$sysReShow){
 		echo					'<tr><td>服务器运行时间：</td><td>'.$sysInfo['uptime'].'</td></tr>';
-		
+
 		echo					'<tr><td>CPU核心：</td><td>';
 		echo					'<table class="table table-condensed table-borderless table-layout"><tbody>';
 		echo					'<tr>';
@@ -360,7 +210,7 @@ switch ($method) {
 		echo					$sysInfo['cpu']['detail'];
 		echo					'</tbody></table>';
 		echo					'</td></tr>';
-		
+
 		echo					'<tr><td>系统平均负载：</td><td>'.$sysInfo['loadAvg'].'</td></tr>';
 		echo					'<tr><td>内存大小：</td><td>';
 		echo					'<table class="table table-condensed table-borderless table-layout"><tbody>';
@@ -384,7 +234,7 @@ switch ($method) {
 		echo					'<tr>';
 		echo					'</tbody></table>';
 		echo					'</td></tr>';
-		
+
 		echo					'<tr><td>交换空间：</td><td>';
 		echo					'<table class="table table-condensed table-borderless table-layout"><tbody>';
 		echo					'<tr>';
@@ -407,7 +257,7 @@ switch ($method) {
 		echo					'<tr>';
 		echo					'</tbody></table>';
 		echo					'</td></tr>';
-		
+
 		echo					'<tr><td>储存空间：</td><td>';
 		echo					'<table class="table table-condensed table-borderless table-layout"><tbody>';
 		echo					'<tr>';
@@ -452,8 +302,8 @@ function sys_linux()
 	  }
 	  if (false !== is_array($res['cpu']['detail'])) $res['cpu']['detail'] = implode("", $res['cpu']['detail']);
 	  }
-   
-   
+
+
   // UPTIME
   if (false === ($str = @file("/proc/uptime"))) return false;
   $str = explode(" ", implode("", $str));
@@ -466,34 +316,34 @@ function sys_linux()
   if ($days !== 0) $res['uptime'] = $days."天";
   if ($hours !== 0) $res['uptime'] .= $hours."小时";
   $res['uptime'] .= $min."分钟";
-   
+
   // MEMORY
   if (false === ($str = @file("/proc/meminfo"))) return false;
   $str = implode("", $str);
   preg_match_all("/MemTotal\s{0,}\:+\s{0,}([\d\.]+).+?MemFree\s{0,}\:+\s{0,}([\d\.]+).+?SwapTotal\s{0,}\:+\s{0,}([\d\.]+).+?SwapFree\s{0,}\:+\s{0,}([\d\.]+)/s", $str, $buf);
-   
+
   $res['memTotal'] = round($buf[1][0]/1024, 2);
   $res['memFree'] = round($buf[2][0]/1024, 2);
   $res['memUsed'] = ($res['memTotal']-$res['memFree']);
   $res['memPercent'] = (floatval($res['memTotal'])!=0)?round($res['memUsed']/$res['memTotal']*100,2):0;
-   
+
   $res['swapTotal'] = round($buf[3][0]/1024, 2);
   $res['swapFree'] = round($buf[4][0]/1024, 2);
   $res['swapUsed'] = ($res['swapTotal']-$res['swapFree']);
   $res['swapPercent'] = (floatval($res['swapTotal'])!=0)?round($res['swapUsed']/$res['swapTotal']*100,2):0;
-   
+
   // LOAD AVG
   if (false === ($str = @file("/proc/loadavg"))) return false;
   $str = explode(" ", implode("", $str));
   $str = array_chunk($str, 3);
   $res['loadAvg'] = implode(" ", $str[0]);
-  
+
   $res['diskTotal'] = format_size(@disk_total_space(".")); //round((@disk_total_space(".")/1024*1024*1024),2);
   $res['diskFree'] = format_size(@disk_free_space(".")); //round((@disk_free_space(".")/1024*1024*1024),2);
   $res['diskUsed'] = $res['diskTotal'] - $res['diskFree'];
   $res['diskPercent'] = round(($res['diskUsed']/$res['diskTotal']*100),2);
-  
-   
+
+
   return $res;
 }
 function format_size($size) {
