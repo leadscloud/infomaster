@@ -1796,17 +1796,25 @@ function determine_url($url, $type, $result=null) {
 		}
 	}
     //如果没有，则查询域名列表domain.php
-    if(!$result){ 
-        $domain_list = domain_get_list();
-        foreach ($domain_list as $author => $domainArray) {
-            $uri = new parseURL($host);
-            $registerableDomain = $uri->getRegisterableDomain();
-            foreach($domainArray as $domain){
-                if(trim($registerableDomain)==trim($domain)) {
-                    return  $author;
-                }
-            }
-        }
+    // if(!$result){ 
+    //     $domain_list = domain_get_list();
+    //     foreach ($domain_list as $author => $domainArray) {
+    //         $uri = new parseURL($host);
+    //         $registerableDomain = $uri->getRegisterableDomain();
+    //         foreach($domainArray as $domain){
+    //             if(trim($registerableDomain)==trim($domain)) {
+    //                 return  $author;
+    //             }
+    //         }
+    //     }
+    // }
+    // 上面的代码mysql查询过多导致mysql出现问题，使用以下代码解决
+    if(!$result){
+        $uri = new parseURL($host);
+        $db = get_conn();
+        $registerableDomain = $uri->getRegisterableDomain();
+        $result = $db->result("SELECT `author` FROM `#@_domain` WHERE `status` = 'approved' AND
+            domain='{$registerableDomain}'");
     }
 	return $result;
 }

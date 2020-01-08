@@ -911,7 +911,9 @@ display: block;
             <h1 class="redtext">询盘信息管理系统</h1>
             <h2>SBM 提供的信息管理服务。</h2>
           </div>
-          <p>系统目前不提供账号注册功能. <span class="text-info"><?php echo get_ip_address(); echo "  ".get_ip_place();?></span></p>
+          <p>系统目前不提供账号注册功能. <span class="text-info">
+          <?php //echo get_ip_address(); echo "  ".get_ip_place();?>
+          </span></p>
           <ul class="features">
             <li>
               <img src="common/img/bootstrap42.png" alt="">

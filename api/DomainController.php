@@ -19,18 +19,25 @@ function get_domain_owner($host, $type='网站所属人', $result=null) {
         }
     }
     //如果没有，则查询域名列表domain.php
-    if(!$result){
-        $domain_list = domain_get_list();
-        $uri = new parseURL($host);
-        $registerableDomain = $uri->getRegisterableDomain();
+    // if(!$result){
+    //     $domain_list = domain_get_list();
+    //     $uri = new parseURL($host);
+    //     $registerableDomain = $uri->getRegisterableDomain();
 
-        foreach ($domain_list as $author => $domainArray) {
-            foreach($domainArray as $domain){
-                if(trim($registerableDomain)==trim($domain)) {
-                    return  $author;
-                }
-            }
-        }
+    //     foreach ($domain_list as $author => $domainArray) {
+    //         foreach($domainArray as $domain){
+    //             if(trim($registerableDomain)==trim($domain)) {
+    //                 return  $author;
+    //             }
+    //         }
+    //     }
+    // }
+    if(!$result){
+        $uri = new parseURL($host);
+        $db = get_conn();
+        $registerableDomain = $uri->getRegisterableDomain();
+        $result = $db->result("SELECT `author` FROM `#@_domain` WHERE `status` = 'approved' AND
+            domain='{$registerableDomain}'");
     }
     return $result;
 }
