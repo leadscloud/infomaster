@@ -303,6 +303,7 @@ switch($setup) {
 		
 		echo '<!DOCTYPE html><html>';
     	echo '<head>';
+    	echo '<meta charset="utf-8">';
    	 	echo '<title>安装向导</title>'; loader_css('css/install'); loader_js('js/jquery'); loader_js('js/bootstrap'); loader_js('js/install');
     	echo '</head><body style="padding-top: 45px;">';
 		

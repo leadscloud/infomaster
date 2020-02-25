@@ -27,8 +27,9 @@ function domain_add($domain,$data=null) {
 }
 
 function domain_exist($domainid) {
-    $domain = domain_get($domainid)['domain'];
+    $domain = domain_get($domainid);
     if(empty($domain)) return false;
+    $domain = $domain['domain'];
     $db = get_conn(); 
     $is_exist = $db->result("SELECT * FROM `#@_domain` WHERE `domain`='{$domain}' AND `status`='approved' LIMIT 1 OFFSET 0;");
     return $is_exist;
